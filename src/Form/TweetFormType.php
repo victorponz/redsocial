@@ -17,6 +17,7 @@ class TweetFormType extends AbstractType
         $builder
             ->add('content')
             ->add('image', FileType::class,[
+                'required' => false,
                 'mapped' => false,
                 'constraints' => [
                     new File([
