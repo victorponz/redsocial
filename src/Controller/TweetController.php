@@ -69,7 +69,7 @@ class TweetController extends AbstractController
         ]);
     }
 
-    #[Route('/tweets/user/{username}', name: 'user_tweets')]
+    #[Route('/tweets/user/@{username}', name: 'user_tweets')]
     public function userTweets (Request $request, ManagerRegistry $doctrine, string $username): Response
     {
         $repo = $doctrine->getRepository(Tweet::class);

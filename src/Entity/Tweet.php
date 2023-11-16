@@ -124,7 +124,7 @@ class Tweet
     }
     private function isPossibleMention(): bool
     {
-        $expression = "/@([a-zA-Z0-9_-]+)/";
+        $expression = "/@@([a-zA-Z0-9_-]+)/";
         $count = preg_match($expression, $this->content, $matches);
         return $count != 0;
     }
@@ -132,9 +132,9 @@ class Tweet
     {
         /* Capurar el grupo delimitado por el carácter @ y fin de línea o espacio
         */
-        $expression = "/@([a-zA-Z0-9_-]+)/";
+        $expression = "/@@([a-zA-Z0-9_-]+)/";
         // Replace @mention with the HTML code using regular expression
-        $this->content = preg_replace($expression, '<a href="/tweets/user/\1">\1</a>', $this->content);
+        $this->content = preg_replace($expression, '<a href="/tweets/user/@\1">@\1</a>', $this->content);
 
     }
 
@@ -146,7 +146,7 @@ class Tweet
     }
     private function isPossibleHashtag(): bool
     {
-        $expression = "/#([a-zA-Z0-9_-]+)/";
+        $expression = "/##([a-zA-Z0-9_-]+)/";
         $count = preg_match($expression, $this->content, $matches);
         return $count != 0;
     }
@@ -154,8 +154,8 @@ class Tweet
     {
         /* Capurar el grupo delimitado por el carácter # y fin de línea o espacio
         */
-        $expression = "/#([a-zA-Z0-9_-]+)/";
+        $expression = "/##([a-zA-Z0-9_-]+)/";
         // Replace @mention with the HTML code using regular expression
-        $this->content = preg_replace($expression, '<a href="/tweets/hashtag/\1">\1</a>', $this->content);
+        $this->content = preg_replace($expression, '<a href="/tweets/hashtag/\1">#\1</a>', $this->content);
      }
 }

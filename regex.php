@@ -32,11 +32,11 @@ $count = preg_match($pattern, $string, $matches);
 //echo $count;
 
 
-$string = "espacio#123-_23 espacio #victor";
-$pattern = "/(#[a-zA-Z0-9_-]+)/";
+$string = "espacio##123-_23 espacio #victor";
+$pattern = "/(##[a-zA-Z0-9_-]+)/";
 
 // Replace @mention with the HTML code using regular expression
-//$newString = preg_replace($pattern, '<a href="/tweets/\1">\1</a>', $string);
+//$newString = preg_replace($pattern, '<a href="/tweets/#\1">\1</a>', $string);
 $count = preg_match_all($pattern, $string, $matches);
 //echo $count;
 
@@ -44,7 +44,7 @@ $count = preg_match_all($pattern, $string, $matches);
 $string = "espacio@123-_23 espacior";
 $expression = "/(@[a-zA-Z0-9_-]+)/";
 $count = preg_match($expression, $string, $matches);
-//echo $count;
+echo $count;
         
         
  function replaceMentions(string $content): string
@@ -71,4 +71,11 @@ $count = preg_match($expression, $string, $matches);
 
     }
 
+$cadena = "@@victor";
+$expression = "/@@([a-zA-Z0-9_-]+)/";
+// Replace @mention with the HTML code using regular expression
+echo preg_replace($expression, '<a href="/tweets/user/@\1">@\1</a>', $cadena);
+
 ?>
+
+
