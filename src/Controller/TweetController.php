@@ -78,8 +78,23 @@ class TweetController extends AbstractController
         $tweets = null;
         if ($user)
             $tweets = $user->getTweets();
-        dump($tweets);
-        exit;
+   
+        return $this->render('tweet/user_tweets.html.twig', [
+            'user' => $user,
+            'tweets' => $tweets
+        ]);
     }
 
+    #[Route('/tweets/hashtag/{hashtag}', name: 'hashtag_tweets')]
+    public function hashtagTweets (Request $request, ManagerRegistry $doctrine, string $hashtag): Response
+    {
+        $repo = $doctrine->getRepository(Tweet::class);
+
+        $tweets = $repo->getAllByHashtag($hashtag);
+
+        return $this->render('tweet/hashtag_tweets.html.twig', [
+            'hashtag' => $hashtag,
+            'tweets' => $tweets
+        ]);
+    }
 }

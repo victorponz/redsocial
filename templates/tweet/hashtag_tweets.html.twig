@@ -1,0 +1,13 @@
+{% extends "base.html.twig" %}
+{% block title %}
+   {{ hashtag }}
+{% endblock %}
+{% block body %}
+    {% if tweets %}   
+    {% for tweet in tweets %}
+        {{include('partials/_tweet.html.twig', {'tweet': tweet})}}
+    {% endfor %}
+    {% else %}
+    <p> Hashtag no encontrado</p>
+    {% endif %} 
+{% endblock %}

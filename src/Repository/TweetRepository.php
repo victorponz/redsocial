@@ -21,6 +21,21 @@ class TweetRepository extends ServiceEntityRepository
         parent::__construct($registry, Tweet::class);
     }
 
+    /**
+    * @return Tweet[] Returns an array of Tweet objects
+    */
+   public function getAllByHashtag($hashtag): array
+   {
+       return $this->createQueryBuilder('t')
+           ->andWhere("t.content LIKE :hashtag")
+           ->setParameter('hashtag', '%'.$hashtag.'%')
+           ->orderBy('t.id', 'DESC')
+           ->setMaxResults(10)
+           ->getQuery()
+           ->getResult()
+       ;
+   }
+
 //    /**
 //     * @return Tweet[] Returns an array of Tweet objects
 //     */

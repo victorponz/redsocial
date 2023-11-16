@@ -38,7 +38,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $avatar = null;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Tweet::class)]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Tweet::class, fetch:"EAGER")]
     private Collection $tweets;
 
     public function __construct()
