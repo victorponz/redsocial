@@ -13,12 +13,13 @@ use App\Form\TweetFormType;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
+
 class TweetController extends AbstractController
 {
     use TargetPathTrait;
 
     #[Route('/tweet/add', name: 'tweet_add')]
-    public function index(Request $request, ManagerRegistry $doctrine, SluggerInterface $slugger, string $firewallName = 'main'): Response
+    public function tweetAdd (Request $request, ManagerRegistry $doctrine, SluggerInterface $slugger, string $firewallName = 'main'): Response
     {
 
         $this->saveTargetPath($request->getSession(), $firewallName, $this->generateUrl("tweet_add"));
@@ -28,7 +29,7 @@ class TweetController extends AbstractController
         $form = $this->createForm(TweetFormType::class, $tweet);
 
         $form->handleRequest($request);
-
+        
         if ($form->isSubmitted() && $form->isValid()) {
             $tweet = $form->getData();
             $image = $form->get('image')->getData();
@@ -55,13 +56,12 @@ class TweetController extends AbstractController
             }
             $tweet->setUser($this->getUser());
             $tweet->setLikes(0);
+
             $entityManager = $doctrine->getManager();
-            //$entityManager->persist($tweet);
-            //$entityManager->flush();
-            echo $this->replaceURLs($tweet->getContent());
-            exit;
-            //return $this->redirectToRoute('ficha_contacto', ["codigo" => $contacto->getId()]);
-            return new Response("Grabado");
+            $entityManager->persist($tweet);
+            $entityManager->flush();
+
+            return new Response("Grabado " . $tweet->getContent());
         }
         return $this->render('tweet/index.html.twig', [
             'form' => $form->createView(),
@@ -78,21 +78,9 @@ class TweetController extends AbstractController
 
     private function isPossibleUrl($content): bool
     {
-
-        $posini = strpos($content, "[");
-        $posfin = strpos($content, ']', $posini);
-       
-        //Ahora comprobamos que el carácter siguient a ] es (
-        if ($content[$posfin+1] != "("){
-            return false;
-        }else{
-            $posParIzquierdo = $posfin + 1;
-        }
-        $posParDerecho = strpos($content, ')', $posParIzquierdo);
-        if ($posParDerecho !== false){
-            return true;
-        }
-        return false;
+        $expression = '/\[+([^\]]+)\]\((.+)\)/';
+        $count = preg_match($expression, $content, $matches);
+        return $count != 0;
     }
     /**
      * Reemplaza [nombre-visible](url) por <a href='url'>nombre-visible<a>
@@ -102,25 +90,62 @@ class TweetController extends AbstractController
      */
     private function replaceURL(string $content): string
     {
-        $posini = strpos($content, "[");
-        $posfin = strpos($content, ']', $posini);
-        
-        //Ahora comprobamos que el carácter siguient a ] es (
-        if ($content[$posfin+1] != "("){
-            return $content;
-        }else{
-            $posParIzquierdo = $posfin + 1;
-        }
-        $posParDerecho = strpos($content, ')', $posParIzquierdo);
-        if ($posParDerecho !== false){
-            //todo bien
-            $texto = substr($content, $posini + 1, $posfin  - $posini - 1);
-            $url = substr($content, $posParIzquierdo + 1, $posParDerecho - $posParIzquierdo - 1);
-            $enlace = "<a href='{$texto}'>{$url}</a>";
-           
-            $content = substr($content, 0, $posini) . $enlace . substr($content, $posParDerecho+1);
-            return $content;            
+        /*
+        Para escribir una url se usa la expresión [nombre-visible](url)
+        La siguiente expresión coincide con dos grupos:
+        El primero, [([^\]]+)], coincide con cualquier texto entre corchetes.
+        El segundo, (.+), coincide con cualquier texto entre paréntesis.
+        */
+        $expression = '/\[+([^\]]+)\]\((.+)\)/';
+        $content = preg_replace($expression, '<a href="\2">\1</a>', $content);
+
+        return $content;
+    }
+    private function replaceMentions(string $content): string
+    {
+        while($this->isPossibleMention($content)){
+            $content = $this->replaceMention($content);
         }
         return $content;
+    }
+    private function isPossibleMention($content): bool
+    {
+        $expression = "/@([a-zA-Z0-9_-]+)/";
+        $count = preg_match($expression, $content, $matches);
+        return $count != 0;
+    }
+    private function replaceMention(string $content): string
+    {
+        /* Capurar el grupo delimitado por el carácter @ y fin de línea o espacio
+        */
+        $expression = "/@([a-zA-Z0-9_-]+)/";
+        // Replace @mention with the HTML code using regular expression
+        $content = preg_replace($expression, '<a href="/tweets/user/\1">\1</a>', $content);
+        return $content;        
+
+    }
+
+    private function replaceHashtags(string $content): string
+    {
+        while($this->isPossibleHashtag($content)){
+            $content = $this->replaceHashtag($content);
+        }
+        return $content;
+    }
+    private function isPossibleHashtag($content): bool
+    {
+        $expression = "/#([a-zA-Z0-9_-]+)/";
+        $count = preg_match($expression, $content, $matches);
+        return $count != 0;
+    }
+    private function replaceHashtag(string $content): string
+    {
+        /* Capurar el grupo delimitado por el carácter # y fin de línea o espacio
+        */
+        $expression = "/#([a-zA-Z0-9_-]+)/";
+        // Replace @mention with the HTML code using regular expression
+        $content = preg_replace($expression, '<a href="/tweets/hashtag/\1">\1</a>', $content);
+        return $content;        
+
     }
 }

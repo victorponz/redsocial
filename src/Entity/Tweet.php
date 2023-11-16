@@ -33,6 +33,7 @@ class Tweet
 
     public function getContent(): ?string
     {
+        $this->formatContent();
         return $this->content;
     }
 
@@ -78,4 +79,83 @@ class Tweet
 
         return $this;
     }
+
+    private function formatContent(){
+        $this->replaceURLs();
+        $this->replaceHashtags();
+        $this->replaceMentions();
+    }
+    private function replaceURLs(): void
+    {
+        while($this->isPossibleUrl()){
+            $this->replaceURL();
+        }
+    }
+
+    private function isPossibleUrl(): bool
+    {
+        $expression = '/\[+([^\]]+)\]\((.+)\)/';
+        $count = preg_match($expression, $this->content, $matches);
+        return $count != 0;
+    }
+    /**
+     * Reemplaza [nombre-visible](url) por <a href='url'>nombre-visible<a>
+     *
+     * @param string $content
+     * @return string
+     */
+    private function replaceURL(): void
+    {
+        /*
+        Para escribir una url se usa la expresión [nombre-visible](url)
+        La siguiente expresión coincide con dos grupos:
+        El primero, [([^\]]+)], coincide con cualquier texto entre corchetes.
+        El segundo, (.+), coincide con cualquier texto entre paréntesis.
+        */
+        $expression = '/\[+([^\]]+)\]\((.+)\)/';
+        $this->content = preg_replace($expression, '<a href="\2">\1</a>', $this->content);
+
+    }
+    private function replaceMentions(): void
+    {
+        while($this->isPossibleMention()){
+            $this->replaceMention();
+        }
+    }
+    private function isPossibleMention(): bool
+    {
+        $expression = "/@([a-zA-Z0-9_-]+)/";
+        $count = preg_match($expression, $this->content, $matches);
+        return $count != 0;
+    }
+    private function replaceMention(): void
+    {
+        /* Capurar el grupo delimitado por el carácter @ y fin de línea o espacio
+        */
+        $expression = "/@([a-zA-Z0-9_-]+)/";
+        // Replace @mention with the HTML code using regular expression
+        $this->content = preg_replace($expression, '<a href="/tweets/user/\1">\1</a>', $this->content);
+
+    }
+
+    private function replaceHashtags(): void
+    {
+        while($this->isPossibleHashtag()){
+            $this->replaceHashtag();
+        }
+    }
+    private function isPossibleHashtag(): bool
+    {
+        $expression = "/#([a-zA-Z0-9_-]+)/";
+        $count = preg_match($expression, $this->content, $matches);
+        return $count != 0;
+    }
+    private function replaceHashtag(): void
+    {
+        /* Capurar el grupo delimitado por el carácter # y fin de línea o espacio
+        */
+        $expression = "/#([a-zA-Z0-9_-]+)/";
+        // Replace @mention with the HTML code using regular expression
+        $this->content = preg_replace($expression, '<a href="/tweets/hashtag/\1">\1</a>', $this->content);
+     }
 }
