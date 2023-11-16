@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Tweet;
+use App\Entity\User;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -66,6 +67,19 @@ class TweetController extends AbstractController
         return $this->render('tweet/index.html.twig', [
             'form' => $form->createView(),
         ]);
+    }
+
+    #[Route('/tweets/user/{username}', name: 'user_tweets')]
+    public function userTweets (Request $request, ManagerRegistry $doctrine, string $username): Response
+    {
+        $repo = $doctrine->getRepository(Tweet::class);
+        $repoUser = $doctrine->getRepository(User::class);
+        $user = $repoUser->findOneByUsername($username);
+        $tweets = null;
+        if ($user)
+            $tweets = $user->getTweets();
+        dump($tweets);
+        exit;
     }
 
 }
