@@ -56,7 +56,7 @@ class TweetController extends AbstractController
             }
             $tweet->setUser($this->getUser());
             $tweet->setLikes(0);
-
+            
             $entityManager = $doctrine->getManager();
             $entityManager->persist($tweet);
             $entityManager->flush();
@@ -67,85 +67,5 @@ class TweetController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-    
-    private function replaceURLs(string $content): string
-    {
-        while($this->isPossibleUrl($content)){
-            $content = $this->replaceURL($content);
-        }
-        return $content;
-    }
 
-    private function isPossibleUrl($content): bool
-    {
-        $expression = '/\[+([^\]]+)\]\((.+)\)/';
-        $count = preg_match($expression, $content, $matches);
-        return $count != 0;
-    }
-    /**
-     * Reemplaza [nombre-visible](url) por <a href='url'>nombre-visible<a>
-     *
-     * @param string $content
-     * @return string
-     */
-    private function replaceURL(string $content): string
-    {
-        /*
-        Para escribir una url se usa la expresión [nombre-visible](url)
-        La siguiente expresión coincide con dos grupos:
-        El primero, [([^\]]+)], coincide con cualquier texto entre corchetes.
-        El segundo, (.+), coincide con cualquier texto entre paréntesis.
-        */
-        $expression = '/\[+([^\]]+)\]\((.+)\)/';
-        $content = preg_replace($expression, '<a href="\2">\1</a>', $content);
-
-        return $content;
-    }
-    private function replaceMentions(string $content): string
-    {
-        while($this->isPossibleMention($content)){
-            $content = $this->replaceMention($content);
-        }
-        return $content;
-    }
-    private function isPossibleMention($content): bool
-    {
-        $expression = "/@([a-zA-Z0-9_-]+)/";
-        $count = preg_match($expression, $content, $matches);
-        return $count != 0;
-    }
-    private function replaceMention(string $content): string
-    {
-        /* Capurar el grupo delimitado por el carácter @ y fin de línea o espacio
-        */
-        $expression = "/@([a-zA-Z0-9_-]+)/";
-        // Replace @mention with the HTML code using regular expression
-        $content = preg_replace($expression, '<a href="/tweets/user/\1">\1</a>', $content);
-        return $content;        
-
-    }
-
-    private function replaceHashtags(string $content): string
-    {
-        while($this->isPossibleHashtag($content)){
-            $content = $this->replaceHashtag($content);
-        }
-        return $content;
-    }
-    private function isPossibleHashtag($content): bool
-    {
-        $expression = "/#([a-zA-Z0-9_-]+)/";
-        $count = preg_match($expression, $content, $matches);
-        return $count != 0;
-    }
-    private function replaceHashtag(string $content): string
-    {
-        /* Capurar el grupo delimitado por el carácter # y fin de línea o espacio
-        */
-        $expression = "/#([a-zA-Z0-9_-]+)/";
-        // Replace @mention with the HTML code using regular expression
-        $content = preg_replace($expression, '<a href="/tweets/hashtag/\1">\1</a>', $content);
-        return $content;        
-
-    }
 }
