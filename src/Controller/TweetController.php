@@ -57,7 +57,8 @@ class TweetController extends AbstractController
             }
             $tweet->setUser($this->getUser());
             $tweet->setLikes(0);
-            
+            echo $tweet->getContent();
+            exit;
             $entityManager = $doctrine->getManager();
             $entityManager->persist($tweet);
             $entityManager->flush();

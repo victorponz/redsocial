@@ -1,12 +1,30 @@
 <?php
-$expression = '/\[+([^\]]+)\]\((.+)\)/';
+// Your Markdown string with links
+$markdown = "This is a [Markdown link](https://www.example.com) exam[Markdown link](https://www.example.2com)ple. [otro](sdfg)";
 
-$text = 'a [Este es un enlace](https://www.google.com) holoa @Bard123 a';
+// Define the regular expression pattern
+$pattern = '/\[([^]]+)\]\(([^)]+)\)/';
+
+// Use preg_replace_callback to replace Markdown links with HTML links
+$html = preg_replace_callback($pattern, function ($matches) {
+    $text = $matches[1];
+    $url = $matches[2];
+    return "<a href=\"$url\">$text</a>";
+}, $markdown);
+
+// Print the HTML result
+echo $html;
+exit;
+  $expression = '/\[+([^\]]+)\]\((.+)\)/';
+  $expression = '/\[+([^\]]+)\]/((.*?)\)';
+////$expression = '/\((.*?)\)/';
+
+$text = 'a [Este es un enlace](https://www.google.com) holoa @Bard123 a [sdff](sdg)';
 
 $replaced_text = preg_replace($expression, '<a href="\2">\1</a>', $text);
 
-//echo $replaced_text;
-
+echo $replaced_text;
+exit;
 $expression = '/@([a-zA-Z0-9_]+)@|$/';
 $text = 'holoa @Bard123 a';
 
@@ -17,8 +35,11 @@ $replaced_text = preg_replace($expression, '<a href="tweets/\1">@\1</a>', $text)
 $expression = '/@([a-zA-Z0-9_]+)@\1/';
 $text = '@Bard123_456 @victor';
 
-$replaced_text = preg_replace($expression, '<a href="tweets/\1">@\1</a>', $text);
-
+$expression = "/@([a-zA-Z0-9_-]+)/";
+// Replace @mention with the HTML code using regular expression
+$text = preg_replace($expression, '<a href="/tweets/user/@\1">@\1</a>', $text);
+echo $text;
+exit;
 //echo $replaced_text;
 
 $string = "espacio@123-_23 espacio @victor";

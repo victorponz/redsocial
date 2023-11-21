@@ -81,9 +81,9 @@ class Tweet
     }
 
     private function formatContent(){
-        $this->replaceURLs();
-        $this->replaceHashtags();
-        $this->replaceMentions();
+        $this->replaceURL();
+        $this->replaceHashtag();
+        $this->replaceMention();
     }
     private function replaceURLs(): void
     {
@@ -94,7 +94,7 @@ class Tweet
 
     private function isPossibleUrl(): bool
     {
-        $expression = '/\[+([^\]]+)\]\((.+)\)/';
+        $expression = '/\[([^]]+)\]\(([^)]+)\)/';
         $count = preg_match($expression, $this->content, $matches);
         return $count != 0;
     }
@@ -112,7 +112,7 @@ class Tweet
         El primero, [([^\]]+)], coincide con cualquier texto entre corchetes.
         El segundo, (.+), coincide con cualquier texto entre paréntesis.
         */
-        $expression = '/\[+([^\]]+)\]\((.+)\)/';
+        $expression = '/\[([^]]+)\]\(([^)]+)\)/';
         $this->content = preg_replace($expression, '<a href="\2">\1</a>', $this->content);
 
     }
@@ -124,7 +124,7 @@ class Tweet
     }
     private function isPossibleMention(): bool
     {
-        $expression = "/@@([a-zA-Z0-9_-]+)/";
+        $expression = "/@([a-zA-Z0-9_-]+)/";
         $count = preg_match($expression, $this->content, $matches);
         return $count != 0;
     }
@@ -132,7 +132,7 @@ class Tweet
     {
         /* Capurar el grupo delimitado por el carácter @ y fin de línea o espacio
         */
-        $expression = "/@@([a-zA-Z0-9_-]+)/";
+        $expression = "/@([a-zA-Z0-9_-]+)/";
         // Replace @mention with the HTML code using regular expression
         $this->content = preg_replace($expression, '<a href="/tweets/user/@\1">@\1</a>', $this->content);
 
@@ -154,7 +154,7 @@ class Tweet
     {
         /* Capurar el grupo delimitado por el carácter # y fin de línea o espacio
         */
-        $expression = "/##([a-zA-Z0-9_-]+)/";
+        $expression = "/#([a-zA-Z0-9_-]+)/";
         // Replace @mention with the HTML code using regular expression
         $this->content = preg_replace($expression, '<a href="/tweets/hashtag/\1">#\1</a>', $this->content);
      }
