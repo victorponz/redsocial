@@ -56,9 +56,7 @@ class TweetController extends AbstractController
                 $tweet->setImage($newFilename);
             }
             $tweet->setUser($this->getUser());
-            $tweet->setLikes(0);
-            echo $tweet->getContent();
-            exit;
+            $tweet->setLikes(0);           
             $entityManager = $doctrine->getManager();
             $entityManager->persist($tweet);
             $entityManager->flush();
@@ -75,20 +73,20 @@ class TweetController extends AbstractController
     {
         $repo = $doctrine->getRepository(Tweet::class);
         $repoUser = $doctrine->getRepository(User::class);
-        $user = $repoUser->findOneByUsername($username);
+        $tweetUser = $repoUser->findOneByUsername($username);
         $tweets = null;
-        if ($user)
-            $tweets = $user->getTweets();
+        if ($tweetUser)
+            $tweets = $tweetUser->getTweets();
    
         return $this->render('tweet/user_tweets.html.twig', [
-            'user' => $user,
+            'tweetUser' => $tweetUser,
             'tweets' => $tweets
         ]);
     }
 
     #[Route('/tweets/hashtag/{hashtag}', name: 'hashtag_tweets')]
     public function hashtagTweets (Request $request, ManagerRegistry $doctrine, string $hashtag): Response
-    {
+    {        
         $repo = $doctrine->getRepository(Tweet::class);
 
         $tweets = $repo->getAllByHashtag($hashtag);

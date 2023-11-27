@@ -1,15 +1,17 @@
 {% extends "base.html.twig" %}
 {% block title %}
-    {% if user %}{{user.username}}{% else %}Usuario no encontrado
+    {% if tweetUser %}{{tweetUser.username}}{% else %}Usuario no encontrado
     {% endif %}
 {% endblock %}
 {% block body %}
-    {% if user %}
-    {{user.username}}
-    {% for tweet in tweets %}
+    {% if tweetUser %}
+        {{tweetUser.username}}
+        {% if app.user != tweetUser %}
+        seguir
+        {% endif %}
+        {% for tweet in tweets %}
         {{include('partials/_tweet.html.twig', {'tweet': tweet})}}
-    {% endfor %}
-    {% else %}
-    <p> Usuario no encontrado</p>
-    {% endif %} 
+        {% endfor %}
+    {% else %}Usuario no encontrado
+    {% endif %}
 {% endblock %}

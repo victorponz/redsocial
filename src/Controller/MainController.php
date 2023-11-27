@@ -17,19 +17,35 @@ class MainController extends AbstractController
             'controller_name' => 'MainController',
         ]);
     }
-    #[Route('/wall/@{username}', name: 'user_wall')]
+    #[Route('/user/@{username}', name: 'user_profile')]
     public function wall(ManagerRegistry $doctrine, string $username): Response
     {
+        $this->denyAccessUnlessGranted("ROLE_USER");
         $repo = $doctrine->getRepository(User::class);
         $user = $repo->findOneByUsername($username);
-        
+
         if (!$user){
-            return new Response("Usuario no encontrado");
+            throw $this->createNotFoundException("Usuario no encontrado");
         }
 
-        return $this->render('main/wall.html.twig', [
+        return $this->render('main/profile.html.twig', [
             'user' => $user
         ]);
     }
+    #[Route('/user/@{username}/follow', name: 'user_follow')]
+    public function follow(ManagerRegistry $doctrine, string $username): Response
+    {
+        $this->denyAccessUnlessGranted("ROLE_USER");
         
+        $repo = $doctrine->getRepository(User::class);
+        $user = $repo->findOneByUsername($username);
+
+        if (!$user){
+            throw $this->createNotFoundException("Usuario no encontrado");
+        }
+
+        return $this->render('main/profile.html.twig', [
+            'user' => $user
+        ]);
+    }     
 }
