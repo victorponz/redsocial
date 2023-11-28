@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Tweet;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,10 +12,12 @@ use Symfony\Component\Routing\Annotation\Route;
 class MainController extends AbstractController
 {
     #[Route('/', name: 'index')]
-    public function index(): Response
+    public function index(ManagerRegistry $doctrine): Response
     {
+        $repo = $doctrine->getRepository(Tweet::class);
+        $tweets = $repo->findAll();
         return $this->render('main/index.html.twig', [
-            'controller_name' => 'MainController',
+            'tweets' => $tweets,
         ]);
     }
     #[Route('/user/@{username}', name: 'user_profile')]
