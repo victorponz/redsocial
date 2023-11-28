@@ -26,14 +26,14 @@ class TweetRepository extends ServiceEntityRepository
     */
    public function getAllByHashtag($hashtag): array
    {
-       return $this->createQueryBuilder('t')
-           ->andWhere("t.content LIKE :hashtag")
-           ->setParameter('hashtag', '%'.$hashtag.'%')
+    //https://stackoverflow.com/questions/6574760/regex-with-doctrine-2-query-builder
+       return $this->createQueryBuilder('t')->andWhere('REGEXP(t.content, :regexp) = true')
+        ->setParameter('regexp', "#hashtag[[:punct:][:space:]]|#$hashtag$")
            ->orderBy('t.id', 'DESC')
            ->setMaxResults(10)
            ->getQuery()
-           ->getResult()
-       ;
+           ->getResult();
+    
    }
 
 //    /**
