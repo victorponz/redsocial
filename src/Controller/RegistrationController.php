@@ -48,6 +48,8 @@ class RegistrationController extends AbstractController
                 // updates the 'file$filename' property to store the PDF file name
                 // instead of its contents
                 $user->setAvatar($newFilename);
+            }else{
+                $user->setAvatar("");
             }
             // encode the plain password
             $user->setPassword(
