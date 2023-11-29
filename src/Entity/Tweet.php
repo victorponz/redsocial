@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\TweetRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -23,8 +25,16 @@ class Tweet
     #[ORM\Column]
     private ?int $likes = null;
 
-    #[ORM\ManyToOne(inversedBy: 'tweets')]
+    #[ORM\ManyToOne(inversedBy: 'tweets', fetch:"EAGER")]
     private ?User $user = null;
+
+    #[ORM\OneToMany(mappedBy: 'tweet', targetEntity: Like::class)]
+    private Collection $likesEntity;
+
+    public function __construct()
+    {
+        $this->likesEntity = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -64,6 +74,12 @@ class Tweet
     public function setLikes(int $likes): static
     {
         $this->likes = $likes;
+
+        return $this;
+    }
+    public function addLike(): static
+    {
+        $this->likes++;
 
         return $this;
     }
@@ -158,4 +174,34 @@ class Tweet
         // Replace @mention with the HTML code using regular expression
         $this->content = preg_replace($expression, '<a href="/tweets/hashtag/\1">#\1</a>', $this->content);
      }
+
+    /**
+     * @return Collection<int, Like>
+     */
+    public function getLikesEntity(): Collection
+    {
+        return $this->likesEntity;
+    }
+
+    public function addLikesEntity(Like $likesEntity): static
+    {
+        if (!$this->likesEntity->contains($likesEntity)) {
+            $this->likesEntity->add($likesEntity);
+            $likesEntity->setTweet($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLikesEntity(Like $likesEntity): static
+    {
+        if ($this->likesEntity->removeElement($likesEntity)) {
+            // set the owning side to null (unless already changed)
+            if ($likesEntity->getTweet() === $this) {
+                $likesEntity->setTweet(null);
+            }
+        }
+
+        return $this;
+    }
 }

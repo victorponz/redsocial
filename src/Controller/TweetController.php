@@ -2,10 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\Like;
 use App\Entity\Tweet;
 use App\Entity\User;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -95,5 +97,41 @@ class TweetController extends AbstractController
             'hashtag' => $hashtag,
             'tweets' => $tweets
         ]);
+    }
+
+    #[Route('/tweet/{id}/like', name: 'tweet_like', requirements: ['id' => '\d+'])]
+    public function like (Request $request, ManagerRegistry $doctrine, int $id, string $firewallName = 'main'): JsonResponse
+    {   
+        $this->saveTargetPath($request->getSession(), $firewallName, $this->generateUrl("tweet_like", ['id' => $id]));
+        $this->denyAccessUnlessGranted("ROLE_USER");
+
+        $repo = $doctrine->getRepository(Tweet::class);
+
+        $tweet = $repo->find($id);
+        $numLikes = 0;
+        if ($tweet){
+            //No seamos narcisistas!!
+           $numLikes = $tweet->getLikes();
+            if ($this->getUser() != $tweet->getUser()){
+                //Comprobar que no haya dado ya like
+                $repoLikes = $doctrine->getRepository(Like::class);
+                $tmpLike = $repoLikes->findOneBy(['user'=>$this->getUser(), 'tweet' => $tweet]);
+                if (empty($tmpLike)){                
+                    $like = new Like();
+                    $like->setUser($this->getUser());
+                    $like->setTweet($tweet);
+                    $entityManager = $doctrine->getManager();
+                    //https://stackoverflow.com/questions/18215975/doctrine-a-new-entity-was-found-through-the-relationship
+                    $entityManager->persist($like);
+                    //Actualizar el contador de likes
+                    $tweet->addLike();
+                    $entityManager->persist($tweet);
+                    $numLikes++;
+                    $entityManager->flush();
+                }
+            }
+        }
+        $data = ["tweetId" => $id, "numLikes" => $numLikes];
+        return new JsonResponse($data, Response::HTTP_OK);
     }
 }
