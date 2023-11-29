@@ -116,13 +116,12 @@ class TweetController extends AbstractController
                 //Comprobar que no haya dado ya like
                 $repoLikes = $doctrine->getRepository(Like::class);
                 $tmpLike = $repoLikes->findOneBy(['user'=>$this->getUser(), 'tweet' => $tweet]);
+                $repoUser = $doctrine->getRepository(User::class);;
                 if (empty($tmpLike)){                
-                    $like = new Like();
-                    $like->setUser($this->getUser());
+                    $like = new Like();           
+                    $like->setUser($repoUser->findOneByUsername($this->getUser()->getUsername()));
                     $like->setTweet($tweet);
                     $entityManager = $doctrine->getManager();
-                    //https://stackoverflow.com/questions/18215975/doctrine-a-new-entity-was-found-through-the-relationship
-                    $entityManager->merge($like);
                     //Actualizar el contador de likes
                     $tweet->addLike();
                     $entityManager->persist($tweet);
