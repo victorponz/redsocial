@@ -2,6 +2,8 @@
 namespace App\Security;
 
 use App\Repository\UserRepository;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
+use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
@@ -43,7 +45,7 @@ class UserProvider implements UserProviderInterface
         $user = $this->userRepository->loadUserByUsernameOrEmail($identifier);
 
         if (!$user) {
-            throw new UsernameNotFoundException();
+            throw new UserNotFoundException();
         }
 
         return $user;
