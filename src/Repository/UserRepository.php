@@ -39,7 +39,15 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
     }
-
+    //https://chat.openai.com/share/8f1e0e54-dd56-45b5-a299-a54e2882272a
+    public function loadUserByUsernameOrEmail(string $usernameOrEmail): ?User
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.username = :query OR u.email = :query')
+            ->setParameter('query', $usernameOrEmail)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 //    /**
 //     * @return User[] Returns an array of User objects
 //     */
