@@ -122,7 +122,7 @@ class TweetController extends AbstractController
                     $like->setTweet($tweet);
                     $entityManager = $doctrine->getManager();
                     //https://stackoverflow.com/questions/18215975/doctrine-a-new-entity-was-found-through-the-relationship
-                    $entityManager->persist($like);
+                    $entityManager->merge($like);
                     //Actualizar el contador de likes
                     $tweet->addLike();
                     $entityManager->persist($tweet);
@@ -132,6 +132,28 @@ class TweetController extends AbstractController
             }
         }
         $data = ["tweetId" => $id, "numLikes" => $numLikes];
+        return new JsonResponse($data, Response::HTTP_OK);
+    }
+
+    #[Route('/tweet/{id}/wholikes', name: 'tweet_wholikes', requirements: ['id' => '\d+'])]
+    public function whoLikes (Request $request, ManagerRegistry $doctrine, int $id, string $firewallName = 'main'): JsonResponse
+    {   
+        // $this->saveTargetPath($request->getSession(), $firewallName, $this->generateUrl("tweet_like", ['id' => $id]));
+        // $this->denyAccessUnlessGranted("ROLE_USER");
+
+        $repo = $doctrine->getRepository(Tweet::class);
+
+        $tweet = $repo->find($id);
+        $numLikes = 0;
+        $data = [];
+        if ($tweet){            
+            foreach($tweet->getLikesEntity()  as $like){
+                $data[] = [
+                    "id"=> $like->getId(),
+                    "username" => ($like->getUser()->getUserName()),
+                ];
+            }
+        }
         return new JsonResponse($data, Response::HTTP_OK);
     }
 }
