@@ -60,4 +60,25 @@ class MainController extends AbstractController
         $data = [];
         return new JsonResponse($data, Response::HTTP_OK);
     }     
+
+    #[Route('/user/@{username}/followers', name: 'user_followers')]
+    public function followers(Request $request, ManagerRegistry $doctrine, string $username, string $firewallName = 'main'): JsonResponse
+    {
+        $this->saveTargetPath($request->getSession(), $firewallName, $this->generateUrl("user_followers", ['username' => $username]));
+        $this->denyAccessUnlessGranted("ROLE_USER");
+
+        $repo = $doctrine->getRepository(User::class);
+
+        $userToFollow = $repo->findOneByUsername($username);
+        $data = [];
+        if ($userToFollow){            
+            foreach($userToFollow->getFollows()  as $follower){
+                $data[] = [
+                    "id"=> $follower->getId(),
+                    "username" => ($follower->getUserName()),
+                ];
+            }
+        }
+        return new JsonResponse($data, Response::HTTP_OK);
+    }     
 }
