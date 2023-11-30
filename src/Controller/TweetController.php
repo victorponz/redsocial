@@ -57,7 +57,10 @@ class TweetController extends AbstractController
                 // instead of its contents
                 $tweet->setImage($newFilename);
             }
-            $tweet->setUser($this->getUser());
+            $repo = $doctrine->getRepository(User::class);
+            $userTweet = $repo->find($this->getUser()->getId());
+
+            $tweet->setUser($userTweet);
             $tweet->setLikes(0);           
             $entityManager = $doctrine->getManager();
             $entityManager->persist($tweet);
