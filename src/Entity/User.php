@@ -45,11 +45,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Like::class)]
     private Collection $likes;
 
+    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'users')]
+    private Collection $follows;
+
+    #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'follows')]
+    private Collection $usersWhoFollow;
+
     public function __construct()
     {
         $this->tweets = new ArrayCollection();
-        $this->follows = new ArrayCollection();
         $this->likes = new ArrayCollection();
+        $this->follows = new ArrayCollection();
+        $this->usersWhoFollow = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -206,4 +213,54 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * @return Collection<int, self>
+     */
+    public function getFollows(): Collection
+    {
+        return $this->follows;
+    }
+
+    public function addFollow(self $follow): static
+    {
+        if (!$this->follows->contains($follow)) {
+            $this->follows->add($follow);
+        }
+
+        return $this;
+    }
+
+    public function removeFollow(self $follow): static
+    {
+        $this->follows->removeElement($follow);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function getUsersWhoFollow(): Collection
+    {
+        return $this->usersWhoFollow;
+    }
+
+    public function addUserWhoFollows(self $user): static
+    {
+        if (!$this->usersWhoFollow->contains($user)) {
+            $this->usersWhoFollow->add($user);
+            $user->addFollow($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserWhoFollows(self $user): static
+    {
+        if ($this->usersWhoFollow->removeElement($user)) {
+            $user->removeFollow($this);
+        }
+
+        return $this;
+    }
 }
