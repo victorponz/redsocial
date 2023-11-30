@@ -65,8 +65,7 @@ class TweetController extends AbstractController
             $entityManager = $doctrine->getManager();
             $entityManager->persist($tweet);
             $entityManager->flush();
-
-            return new Response("Grabado " . $tweet->getContent());
+            return $this->redirect($this->generateUrl("user_tweets_timeline", []));
         }
         return $this->render('tweet/index.html.twig', [
             'form' => $form->createView(),
@@ -160,4 +159,19 @@ class TweetController extends AbstractController
         }
         return new JsonResponse($data, Response::HTTP_OK);
     }
+    #[Route('/tweets', name: 'user_tweets_timeline')]
+    public function userTweetsTimeLine (Request $request, ManagerRegistry $doctrine, string $firewallName = 'main'): Response
+    {
+        $this->saveTargetPath($request->getSession(), $firewallName, $this->generateUrl("user_tweets_timeline", []));
+        $this->denyAccessUnlessGranted("ROLE_USER");
+
+        $repo = $doctrine->getRepository(Tweet::class);
+        $tweets = $this->getUser()->getTweets();
+        
+        return $this->render('tweet/user_tweets.html.twig', [
+            'tweetUser' => $this->getUser(),
+            'tweets' => $tweets
+        ]);
+    }
+
 }
