@@ -9,13 +9,18 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 
 class TweetFormType extends AbstractType
 {
+    public function __construct(
+        private ContainerBagInterface $params,
+    ) {
+    }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('content')
+            ->add('content', null, ["attr" => ["maxlength" =>  $this->params->get('max_tweet_length')]])
             ->add('image', FileType::class,[
                 'required' => false,
                 'mapped' => false,
