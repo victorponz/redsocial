@@ -111,15 +111,17 @@ class TweetController extends AbstractController
         $numLikes = 0;
         if ($tweet){
             //No seamos narcisistas!!
-           $numLikes = $tweet->getLikes();
-            if ($this->getUser() != $tweet->getUser()){
+            $numLikes = $tweet->getLikes();
+            $repoUser = $doctrine->getRepository(User::class);
+            $userTMP = $repoUser->findOneByUsername($this->getUser()->getUsername());
+            if ($userTMP != $tweet->getUser()){
                 //Comprobar que no haya dado ya like
                 $repoLikes = $doctrine->getRepository(Like::class);
                 $tmpLike = $repoLikes->findOneBy(['user'=>$this->getUser(), 'tweet' => $tweet]);
-                $repoUser = $doctrine->getRepository(User::class);;
+                
                 if (empty($tmpLike)){                
                     $like = new Like();           
-                    $like->setUser($repoUser->findOneByUsername($this->getUser()->getUsername()));
+                    $like->setUser($userTMP);
                     $like->setTweet($tweet);
                     $entityManager = $doctrine->getManager();
                     //Actualizar el contador de likes
