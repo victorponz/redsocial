@@ -61,8 +61,30 @@ class MainController extends AbstractController
         return new JsonResponse($data, Response::HTTP_OK);
     }     
 
-    #[Route('/user/@{username}/followers', name: 'user_followers')]
+    #[Route('/user/@{username}/following', name: 'user_following')]
     public function followers(Request $request, ManagerRegistry $doctrine, string $username, string $firewallName = 'main'): JsonResponse
+    {
+        $this->saveTargetPath($request->getSession(), $firewallName, $this->generateUrl("user_following", ['username' => $username]));
+        $this->denyAccessUnlessGranted("ROLE_USER");
+
+        $repo = $doctrine->getRepository(User::class);
+
+        $userToFollow = $repo->findOneByUsername($username);
+        $data = [];
+        if ($userToFollow){            
+            foreach($userToFollow->getFollows()  as $following){
+                $data[] = [
+                    "id"=> $following->getId(),
+                    "username" => ($following->getUserName()),
+                ];
+            }
+        }
+        return new JsonResponse($data, Response::HTTP_OK);
+    }     
+
+
+    #[Route('/user/@{username}/followers', name: 'user_followers')]
+    public function following(Request $request, ManagerRegistry $doctrine, string $username, string $firewallName = 'main'): JsonResponse
     {
         $this->saveTargetPath($request->getSession(), $firewallName, $this->generateUrl("user_followers", ['username' => $username]));
         $this->denyAccessUnlessGranted("ROLE_USER");
@@ -72,7 +94,7 @@ class MainController extends AbstractController
         $userToFollow = $repo->findOneByUsername($username);
         $data = [];
         if ($userToFollow){            
-            foreach($userToFollow->getFollows()  as $follower){
+            foreach($userToFollow->getUsersWhoFollow()  as $follower){
                 $data[] = [
                     "id"=> $follower->getId(),
                     "username" => ($follower->getUserName()),
@@ -80,5 +102,5 @@ class MainController extends AbstractController
             }
         }
         return new JsonResponse($data, Response::HTTP_OK);
-    }     
+    }  
 }
