@@ -51,6 +51,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'follows')]
     private Collection $usersWhoFollow;
 
+    #[ORM\Column(length: 255)]
+    private ?string $fullName = null;
+
     public function __construct()
     {
         $this->tweets = new ArrayCollection();
@@ -260,6 +263,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         if ($this->usersWhoFollow->removeElement($user)) {
             $user->removeFollow($this);
         }
+
+        return $this;
+    }
+
+    public function getFullName(): ?string
+    {
+        return $this->fullName;
+    }
+
+    public function setFullName(string $fullName): static
+    {
+        $this->fullName = $fullName;
 
         return $this;
     }

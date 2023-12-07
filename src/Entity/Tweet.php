@@ -36,6 +36,9 @@ class Tweet
     #[ORM\OneToMany(mappedBy: 'tweet', targetEntity: Like::class)]
     private Collection $likesEntity;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $date = null;
+
     public function __construct()
     {
         $this->likesEntity = new ArrayCollection();
@@ -206,6 +209,18 @@ class Tweet
                 $likesEntity->setTweet(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDate(): ?\DateTimeInterface
+    {
+        return $this->date;
+    }
+
+    public function setDate(?\DateTimeInterface $date): static
+    {
+        $this->date = $date;
 
         return $this;
     }
