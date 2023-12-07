@@ -33,7 +33,7 @@ class Tweet
     #[ORM\ManyToOne(inversedBy: 'tweets', fetch:"EAGER")]
     private ?User $user = null;
 
-    #[ORM\OneToMany(mappedBy: 'tweet', targetEntity: Like::class)]
+    #[ORM\OneToMany(mappedBy: 'tweet', fetch:"LAZY", targetEntity: Like::class)]
     private Collection $likesEntity;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
