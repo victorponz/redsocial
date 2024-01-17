@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Doctrine\Persistence\ManagerRegistry;
 
 class UserProfileController extends AbstractController
@@ -40,9 +41,13 @@ class UserProfileController extends AbstractController
     {
         $user = $this->getUser();
         $user->setUserName($nombre);
-        $this->container->get(TokenStorageInterface::class)->setToken(
-            new UsernamePasswordToken($user, null, 'main', ["user"=>$user])
-        );
+        // $this->container->get(TokenStorageInterface::class)->setToken(
+        //     new UsernamePasswordToken($user, null, 'main', ["user"=>$user])
+        // );
+        // Manually authenticate user in controller
+        $token = new UsernamePasswordToken($user, 'main', ["user"=>$user]);
+        $this->container->get('security.token_storage')->setToken($token);
+        $this->container->get('session')->set('_security_main', serialize($token));
         return $this->redirectToRoute("index");
         
         $repo = $doctrine->getRepository(User::class);
