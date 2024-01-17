@@ -44,6 +44,7 @@ class Tweet
 
     public function __construct()
     {
+        $this->date = new \DateTime();
         $this->likesEntity = new ArrayCollection();
     }
 
