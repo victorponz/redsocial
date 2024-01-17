@@ -18,8 +18,8 @@ class FormatContentService
         El primero, [([^\]]+)], coincide con cualquier texto entre corchetes.
         El segundo, (.+), coincide con cualquier texto entre paréntesis.
         */
-        $expression = '/\[([^]]+)\]\(([^)]+)\)/';
-        return preg_replace($expression, '<a href="\2">\1</a>', $content);
+        $expression = '/(https?:\/\/\S+)/';
+        return preg_replace($expression, '<a href="\1">\1</a>', $content);
 
     }
     private function replaceMention(string $content): string
