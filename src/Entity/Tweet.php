@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TweetRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Tweet
 {
     #[ORM\Id]
@@ -23,6 +24,8 @@ class Tweet
         maxMessage: 'El mensaje no debe sobrepasar los {{ limit }} caracteres',
     )]
     private ?string $content = null;
+
+    private ?string $formattedContent = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
@@ -51,7 +54,7 @@ class Tweet
 
     public function getContent(): ?string
     {
-        $this->formatContent();
+        //$this->formatContent();
         return $this->content;
     }
 
@@ -62,6 +65,18 @@ class Tweet
         return $this;
     }
 
+    public function getFormattedContent(): ?string
+    {
+        //$this->formatContent();
+        return $this->formattedContent;
+    }
+
+    public function setFormattedContent(string $formattedContent): static
+    {
+        $this->formattedContent = $formattedContent;
+
+        return $this;
+    }
     public function getImage(): ?string
     {
         return $this->image;
