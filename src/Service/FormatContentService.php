@@ -19,7 +19,6 @@ class FormatContentService
         El segundo, (.+), coincide con cualquier texto entre paréntesis.
         */
         $expression = '/(https?:\/\/\S+)/';
-        //return preg_replace($expression, '<a href="\1">\1</a>', $content);
         return \preg_replace_callback($expression, 
             function ($matches) {
                     return "<a href='".  $matches[0] . "'>" . $matches[0] . "</a>";               
