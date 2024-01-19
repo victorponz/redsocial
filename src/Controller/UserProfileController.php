@@ -10,7 +10,6 @@ use App\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Doctrine\Persistence\ManagerRegistry;
-
 class UserProfileController extends AbstractController
 {
     #[Route('/user/profile', name: 'app_user_profile')]
@@ -39,20 +38,13 @@ class UserProfileController extends AbstractController
     #[Route('/user/change_dos/{nombre}', name: 'cambiar_nombre_dos')]
     public function cambiarNombreDos(Request $request, ManagerRegistry $doctrine, string $nombre): Response
     {
-        $user = $this->getUser();
-        $user->setUserName($nombre);
-        // $this->container->get(TokenStorageInterface::class)->setToken(
-        //     new UsernamePasswordToken($user, null, 'main', ["user"=>$user])
-        // );
-        // Manually authenticate user in controller
-        $token = new UsernamePasswordToken($user, 'main', ["user"=>$user]);
-        $this->container->get('security.token_storage')->setToken($token);
-        $this->container->get('session')->set('_security_main', serialize($token));
-        return $this->redirectToRoute("index");
-        
+        //Cambiamos los nombres tanto del usuario logeado en $this->getUser como del
+        //usuario obtenido en el repositorio.
+        //de lo contrario no
         $repo = $doctrine->getRepository(User::class);
         $user = $this->getUser();
         $user->setUserName($nombre);
+        
         $entityManager = $doctrine->getManager();
         $userFromRepo = $repo->find($user->getId());
         $userFromRepo->setUserName($nombre);
