@@ -19,7 +19,7 @@ class TweetLoadListener
     // the entity instance and the lifecycle event
     public function postLoad(Tweet $tweet, PostLoadEventArgs $event): void
     {
-        $tweet->setFormattedContent($this->formatContentService->format($tweet->getContent()));
+        //$tweet->setFormattedContent($this->formatContentService->format($tweet->getContent()));
         // ... do something to notify the changes
     }
 }
