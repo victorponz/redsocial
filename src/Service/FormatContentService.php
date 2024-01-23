@@ -9,6 +9,9 @@ class FormatContentService
         $this->urlGenerator = $urlGenerator;
 
     }
+    public function getUrlGenerator(){
+        return $this->urlGenerator;
+    }
   
     private function replaceURL(string $content): string
     {

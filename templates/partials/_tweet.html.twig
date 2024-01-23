@@ -12,7 +12,7 @@
     {% if tweet.image %}
     <div class='tweet-img'><img src='{{asset('assets/images/') ~ tweet.image}}'/></div>
     {% endif %}
-    <div class='tweet-content'>{{tweet.formattedContent | raw}}</div>
+    <div class='tweet-content'>{{tweet.content | formatMention | formatHashtag | formatURL | raw}}</div>
     <div class='tweet-footer'>
         <li class='tweet-date'>{{tweet.date | date('h:m A d M. o')}}</li>
         {% if tweet.user.id != (app.user.id ?? -1)%}
