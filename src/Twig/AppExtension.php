@@ -12,8 +12,7 @@ class AppExtension extends AbstractExtension
     private $formatContentService;
     private $urlGenerator;
 
-    public function __construct(FormatContentService $formatContentService, UrlGeneratorInterface $urlGenerator){
-        $this->formatContentService = $formatContentService;
+    public function __construct(UrlGeneratorInterface $urlGenerator){
         $this->urlGenerator = $urlGenerator;
     }
     public function getFilters(): array
