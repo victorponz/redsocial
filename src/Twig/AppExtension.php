@@ -2,15 +2,19 @@
 // src/Twig/AppExtension.php
 namespace App\Twig;
 
-use App\Service\FormatContentService;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
 
 class AppExtension extends AbstractExtension
 {
     private $formatContentService;
-    public function __construct(FormatContentService $formatContentService){
+    private $urlGenerator;
+
+    public function __construct(FormatContentService $formatContentService, UrlGeneratorInterface $urlGenerator){
         $this->formatContentService = $formatContentService;
+        $this->urlGenerator = $urlGenerator;
     }
     public function getFilters(): array
     {
@@ -29,7 +33,7 @@ class AppExtension extends AbstractExtension
         // Replace @mention with the HTML code using regular expression
         return \preg_replace_callback($expression, 
             function ($matches) {
-                return "<a href='" . $this->formatContentService->getUrlGenerator()->generate("user_tweets", ['username'=>substr($matches[0], 1)]) . "'>" . $matches[0] . "</a>";
+                return "<a href='" . $this->urlGenerator->generate("user_tweets", ['username'=>substr($matches[0], 1)]) . "'>" . $matches[0] . "</a>";
             },
             $content);
 
@@ -42,7 +46,7 @@ class AppExtension extends AbstractExtension
         // Replace @mention with the HTML code using regular expression
         return \preg_replace_callback($expression, 
             function ($matches) {
-                return "<a href='" . $this->formatContentService->getUrlGenerator()->generate("hashtag_tweets", ['hashtag'=>substr($matches[0], 1)]) . "'>" . $matches[0] . "</a>";
+                return "<a href='" . $this->urlGenerator->generate("hashtag_tweets", ['hashtag'=>substr($matches[0], 1)]) . "'>" . $matches[0] . "</a>";
             },
             $content);
     }
