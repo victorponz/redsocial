@@ -21,6 +21,7 @@ class RegistrationFormType extends AbstractType
     {
         $builder
             ->add('username')
+            ->add('fullName')
             ->add('email')
             ->add('avatar', FileType::class,[
                 'mapped' => false,
