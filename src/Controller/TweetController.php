@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Like;
 use App\Entity\Tweet;
 use App\Entity\User;
+use App\Repository\TweetRepository;
+use App\Repository\UserRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -59,6 +61,7 @@ class TweetController extends AbstractController
                 // instead of its contents
                 $tweet->setImage($newFilename);
             }
+
             $repo = $doctrine->getRepository(User::class);
             $userTweet = $repo->find($this->getUser()->getId());
 
@@ -77,7 +80,9 @@ class TweetController extends AbstractController
     #[Route('/tweets/user/@{username}', name: 'user_tweets')]
     public function userTweets(Request $request, ManagerRegistry $doctrine, string $username): Response
     {
-        $repo = $doctrine->getRepository(Tweet::class);
+        /**
+         * @var UserRepository $repoUser
+         */
         $repoUser = $doctrine->getRepository(User::class);
         $tweetUser = $repoUser->findOneByUsername($username);
         $tweets = null;
@@ -93,6 +98,9 @@ class TweetController extends AbstractController
     #[Route('/tweets/hashtag/{hashtag}', name: 'hashtag_tweets')]
     public function hashtagTweets(Request $request, ManagerRegistry $doctrine, string $hashtag): Response
     {
+        /**
+         * @var TweetRepository $repo
+         */
         $repo = $doctrine->getRepository(Tweet::class);
 
         $tweets = $repo->getAllByHashtag($hashtag);
@@ -116,6 +124,9 @@ class TweetController extends AbstractController
         if ($tweet) {
             //No seamos narcisistas!!
             $numLikes = $tweet->getLikes();
+            /**
+             * @var UserRepository $repoUser
+             */
             $repoUser = $doctrine->getRepository(User::class);
             $userTMP = $repoUser->findOneByUsername($this->getUser()->getUsername());
             if ($userTMP != $tweet->getUser()) {
@@ -171,6 +182,9 @@ class TweetController extends AbstractController
         //No se por qué pero se hacen recursivos. Cada vez que refrescas la página se van concatenando
         //Será porque está mal hecho el parsear los mensajes?
         //$tweets = $this->getUser()->getTweets();
+        /**
+         * @var UserRepository $repoUser
+         */
         $repoUser = $doctrine->getRepository(User::class);
         $user = $repoUser->findOneByUsername($this->getUser()->getUsername());
         $tweets = $user->getTweets();
