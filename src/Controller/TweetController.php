@@ -22,9 +22,11 @@ class TweetController extends AbstractController
     use TargetPathTrait;
 
     #[Route('/tweet/add', name: 'tweet_add')]
-    public function tweetAdd (Request $request, ManagerRegistry $doctrine, SluggerInterface $slugger, string $firewallName = 'main'): Response
+    public function tweetAdd(Request $request, ManagerRegistry $doctrine, SluggerInterface $slugger, string $firewallName = 'main'): Response
     {
 
+        // Guardar la URL de la página actual para redirigir al usuario después de la operación
+        // si el usuario no está autenticado
         $this->saveTargetPath($request->getSession(), $firewallName, $this->generateUrl("tweet_add"));
         $this->denyAccessUnlessGranted("ROLE_USER");
         $tweet = new Tweet();
@@ -32,7 +34,7 @@ class TweetController extends AbstractController
         $form = $this->createForm(TweetFormType::class, $tweet);
 
         $form->handleRequest($request);
-        
+
         if ($form->isSubmitted() && $form->isValid()) {
             $tweet = $form->getData();
             $image = $form->get('image')->getData();
@@ -40,13 +42,13 @@ class TweetController extends AbstractController
                 $originalFilename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
                 // this is needed to safely include the file name as part of the URL
                 $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename.'-'.uniqid().'.'.$image->guessExtension();
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $image->guessExtension();
 
                 // Move the file to the directory where images are stored
                 try {
 
                     $image->move($this->getParameter('images_directory'), $newFilename);
-                   
+
 
                 } catch (FileException $e) {
                     // ... handle exception if something happens during file upload
@@ -61,7 +63,7 @@ class TweetController extends AbstractController
             $userTweet = $repo->find($this->getUser()->getId());
 
             $tweet->setUser($userTweet);
-            $tweet->setLikes(0);           
+            $tweet->setLikes(0);
             $entityManager = $doctrine->getManager();
             $entityManager->persist($tweet);
             $entityManager->flush();
@@ -73,7 +75,7 @@ class TweetController extends AbstractController
     }
 
     #[Route('/tweets/user/@{username}', name: 'user_tweets')]
-    public function userTweets (Request $request, ManagerRegistry $doctrine, string $username): Response
+    public function userTweets(Request $request, ManagerRegistry $doctrine, string $username): Response
     {
         $repo = $doctrine->getRepository(Tweet::class);
         $repoUser = $doctrine->getRepository(User::class);
@@ -81,7 +83,7 @@ class TweetController extends AbstractController
         $tweets = null;
         if ($tweetUser)
             $tweets = $tweetUser->getTweets();
-   
+
         return $this->render('tweet/user_tweets.html.twig', [
             'tweetUser' => $tweetUser,
             'tweets' => $tweets
@@ -89,8 +91,8 @@ class TweetController extends AbstractController
     }
 
     #[Route('/tweets/hashtag/{hashtag}', name: 'hashtag_tweets')]
-    public function hashtagTweets (Request $request, ManagerRegistry $doctrine, string $hashtag): Response
-    {        
+    public function hashtagTweets(Request $request, ManagerRegistry $doctrine, string $hashtag): Response
+    {
         $repo = $doctrine->getRepository(Tweet::class);
 
         $tweets = $repo->getAllByHashtag($hashtag);
@@ -102,8 +104,8 @@ class TweetController extends AbstractController
     }
 
     #[Route('/tweet/{id}/like', name: 'tweet_like', requirements: ['id' => '\d+'])]
-    public function like (Request $request, ManagerRegistry $doctrine, int $id, string $firewallName = 'main'): JsonResponse
-    {   
+    public function like(Request $request, ManagerRegistry $doctrine, int $id, string $firewallName = 'main'): JsonResponse
+    {
         $this->saveTargetPath($request->getSession(), $firewallName, $this->generateUrl("tweet_like", ['id' => $id]));
         $this->denyAccessUnlessGranted("ROLE_USER");
 
@@ -111,18 +113,18 @@ class TweetController extends AbstractController
 
         $tweet = $repo->find($id);
         $numLikes = 0;
-        if ($tweet){
+        if ($tweet) {
             //No seamos narcisistas!!
             $numLikes = $tweet->getLikes();
             $repoUser = $doctrine->getRepository(User::class);
             $userTMP = $repoUser->findOneByUsername($this->getUser()->getUsername());
-            if ($userTMP != $tweet->getUser()){
+            if ($userTMP != $tweet->getUser()) {
                 //Comprobar que no haya dado ya like
                 $repoLikes = $doctrine->getRepository(Like::class);
-                $tmpLike = $repoLikes->findOneBy(['user'=>$this->getUser(), 'tweet' => $tweet]);
-                
-                if (empty($tmpLike)){                
-                    $like = new Like();           
+                $tmpLike = $repoLikes->findOneBy(['user' => $this->getUser(), 'tweet' => $tweet]);
+
+                if (empty($tmpLike)) {
+                    $like = new Like();
                     $like->setUser($userTMP);
                     $like->setTweet($tweet);
                     $entityManager = $doctrine->getManager();
@@ -139,8 +141,8 @@ class TweetController extends AbstractController
     }
 
     #[Route('/tweet/{id}/wholikes', name: 'tweet_wholikes', requirements: ['id' => '\d+'])]
-    public function whoLikes (Request $request, ManagerRegistry $doctrine, int $id, string $firewallName = 'main'): JsonResponse
-    {   
+    public function whoLikes(Request $request, ManagerRegistry $doctrine, int $id, string $firewallName = 'main'): JsonResponse
+    {
         // $this->saveTargetPath($request->getSession(), $firewallName, $this->generateUrl("tweet_like", ['id' => $id]));
         // $this->denyAccessUnlessGranted("ROLE_USER");
 
@@ -149,10 +151,10 @@ class TweetController extends AbstractController
         $tweet = $repo->find($id);
         $numLikes = 0;
         $data = [];
-        if ($tweet){            
-            foreach($tweet->getLikesEntity()  as $like){
+        if ($tweet) {
+            foreach ($tweet->getLikesEntity() as $like) {
                 $data[] = [
-                    "id"=> $like->getId(),
+                    "id" => $like->getId(),
                     "username" => ($like->getUser()->getUserName()),
                 ];
             }
@@ -160,7 +162,7 @@ class TweetController extends AbstractController
         return new JsonResponse($data, Response::HTTP_OK);
     }
     #[Route('/tweets', name: 'user_tweets_timeline')]
-    public function userTweetsTimeLine (Request $request, ManagerRegistry $doctrine, string $firewallName = 'main'): Response
+    public function userTweetsTimeLine(Request $request, ManagerRegistry $doctrine, string $firewallName = 'main'): Response
     {
         $this->saveTargetPath($request->getSession(), $firewallName, $this->generateUrl("user_tweets_timeline", []));
         $this->denyAccessUnlessGranted("ROLE_USER");
