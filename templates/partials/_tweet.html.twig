@@ -17,7 +17,7 @@
 	{% if tweet.image %}
 		<div class='tweet-img'><img src='{{asset('assets/images/') ~ tweet.image}}'/></div>
 	{% endif %}
-	<div class='tweet-content'>{{tweet.content | formatMention | formatHashtag | formatURL | raw}}</div>
+	<div class='tweet-content'>{{tweet.content | striptags | escape | formatMention | formatHashtag | formatURL| raw}}</div>
 	<div class='tweet-footer'>
 		<li class='tweet-date'>
 			<span class='timeago'>{{tweet.date | date('m/d/Y H:i:s')}}</span>
