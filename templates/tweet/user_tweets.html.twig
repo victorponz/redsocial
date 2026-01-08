@@ -1,17 +1,18 @@
 {% extends "base.html.twig" %}
 {% block title %}
-    {% if tweetUser %}{{tweetUser.username}}{% else %}Usuario no encontrado
-    {% endif %}
+	{% if tweetUser %}
+		{{tweetUser.username}}{% else %}Usuario no encontrado
+	{% endif %}
 {% endblock %}
 {% block body %}
-    {% if tweetUser %}
-        {{tweetUser.username}}
-        {% if app.user != tweetUser %}
-        seguir
-        {% endif %}
-        {% for tweet in tweets %}
-        {{include('partials/_tweet.html.twig', {'tweet': tweet})}}
-        {% endfor %}
-    {% else %}Usuario no encontrado
-    {% endif %}
+	{% if tweetUser %}
+		{{tweetUser.username}}
+		{% if app.user.id != tweetUser.id %}
+			seguir
+		{% endif %}
+		{% for tweet in tweets %}
+			{{include('partials/_tweet.html.twig', {'tweet': tweet})}}
+		{% endfor %}
+		{% else %}Usuario no encontrado
+	{% endif %}
 {% endblock %}
