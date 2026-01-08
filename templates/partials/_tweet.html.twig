@@ -1,22 +1,31 @@
 <div class='tweet' data-id='{{tweet.id}}'>
-     <div class='tweet_header'>
-        <ul>
-            <li> <a href="{{path('user_profile', {'username': tweet.user.username})}}">
-                    <img class="tweet-avatar img-responsive" src="{{ asset('assets/images/' ~ tweet.image) }}" alt="{{tweet.user.username}}">
-                </a>
-            </li>
-            <li class='tweet-full-username'><a href="{{path('user_profile', {'username': tweet.user.username})}}">{{tweet.user.fullName}}</a></li>
-            <li class='tweet-username'><a href="{{path('user_tweets', {'username': tweet.user.username})}}">@{{tweet.user.username}}</a></li>
-        </ul>
-    </div>
-    {% if tweet.image %}
-    <div class='tweet-img'><img src='{{asset('assets/images/') ~ tweet.image}}'/></div>
-    {% endif %}
-    <div class='tweet-content'>{{tweet.content | formatMention | formatHashtag | formatURL | raw}}</div>
-    <div class='tweet-footer'>
-        <li class='tweet-date'>{{tweet.date | date('h:m A d M. o')}}</li>
-        {% if tweet.user.id != (app.user.id ?? -1)%}
-            <li class='tweet-like'><a href="{{path('tweet_like', {'id': tweet.id})}}" title='{{tweet.likes}}'>Like</a></li>
-        {% endif %}
-    </div>
+	<div class='tweet_header'>
+		<ul>
+			<li>
+				<a href="{{path('user_profile', {'username': tweet.user.username})}}">
+					<img class="tweet-avatar img-responsive" src="{{ asset('assets/images/' ~ tweet.image) }}" alt="{{tweet.user.username}}">
+				</a>
+			</li>
+			<li class='tweet-full-username'>
+				<a href="{{path('user_profile', {'username': tweet.user.username})}}">{{tweet.user.fullName}}</a>
+			</li>
+			<li class='tweet-username'>
+				<a href="{{path('user_tweets', {'username': tweet.user.username})}}">@{{tweet.user.username}}</a>
+			</li>
+		</ul>
+	</div>
+	{% if tweet.image %}
+		<div class='tweet-img'><img src='{{asset('assets/images/') ~ tweet.image}}'/></div>
+	{% endif %}
+	<div class='tweet-content'>{{tweet.content | formatMention | formatHashtag | formatURL | raw}}</div>
+	<div class='tweet-footer'>
+		<li class='tweet-date'>
+			<span class='timeago'>{{tweet.date | date('m/d/Y H:i:s')}}</span>
+		</li>
+		{% if tweet.user.id != (app.user.id ?? -1)%}
+			<li class='tweet-like'>
+				<a href="{{path('tweet_like', {'id': tweet.id})}}" title='{{tweet.likes}}'>Like</a>
+			</li>
+		{% endif %}
+	</div>
 </div>
