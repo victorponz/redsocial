@@ -12,7 +12,8 @@ class AppExtension extends AbstractExtension
     private $formatContentService;
     private $urlGenerator;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator){
+    public function __construct(UrlGeneratorInterface $urlGenerator)
+    {
         $this->urlGenerator = $urlGenerator;
     }
     public function getFilters(): array
@@ -27,27 +28,31 @@ class AppExtension extends AbstractExtension
     public function formatMention(string $content): string
     {
         /* Capturar el grupo delimitado por el carácter @ y fin de línea o espacio
-        */
+         */
         $expression = "/@[a-zA-Z0-9_-]+/";
         // Replace @mention with the HTML code using regular expression
-        return \preg_replace_callback($expression, 
+        return \preg_replace_callback(
+            $expression,
             function ($matches) {
-                return "<a href='" . $this->urlGenerator->generate("user_tweets", ['username'=>substr($matches[0], 1)]) . "'>" . $matches[0] . "</a>";
+                return "<a href='" . $this->urlGenerator->generate("user_tweets", ['username' => substr($matches[0], 1)]) . "'>" . $matches[0] . "</a>";
             },
-            $content);
+            $content
+        );
 
     }
     public function formatHashtag(string $content): string
     {
         /* Capturar el grupo delimitado por el carácter # y fin de línea o espacio
-        */
+         */
         $expression = "/#([a-zA-Z0-9_-]+)/";
         // Replace @mention with the HTML code using regular expression
-        return \preg_replace_callback($expression, 
+        return \preg_replace_callback(
+            $expression,
             function ($matches) {
-                return "<a href='" . $this->urlGenerator->generate("hashtag_tweets", ['hashtag'=>substr($matches[0], 1)]) . "'>" . $matches[0] . "</a>";
+                return "<a href='" . $this->urlGenerator->generate("hashtag_tweets", ['hashtag' => substr($matches[0], 1)]) . "'>" . $matches[0] . "</a>";
             },
-            $content);
+            $content
+        );
     }
     public function formatURL(string $content): string
     {
@@ -57,12 +62,14 @@ class AppExtension extends AbstractExtension
         El primero, [([^\]]+)], coincide con cualquier texto entre corchetes.
         El segundo, (.+), coincide con cualquier texto entre paréntesis.
         */
-        $expression = '/(https?:\/\/\S+)/';
-        return \preg_replace_callback($expression, 
+        $expression = '/\[([^\]]+)\]\(([^)]+)\)/';
+        return \preg_replace_callback(
+            $expression,
             function ($matches) {
-                    return "<a href='".  $matches[0] . "'>" . $matches[0] . "</a>";               
+                return "<a href='" . $matches[2] . "'>" . $matches[1] . "</a>";
             },
-            $content);
+            $content
+        );
 
     }
 }
