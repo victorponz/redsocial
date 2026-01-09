@@ -59,8 +59,8 @@ class AppExtension extends AbstractExtension
         /*
         Para escribir una url se usa la expresión [nombre-visible](url)
         La siguiente expresión coincide con dos grupos:
-        El primero, [([^\]]+)], coincide con cualquier texto entre corchetes.
-        El segundo, (.+), coincide con cualquier texto entre paréntesis.
+        El primero, [/\[([^\]]+)\], coincide con cualquier texto entre corchetes.
+        El segundo, \(([^)]+)\)/, coincide con cualquier texto entre paréntesis.
         */
         $expression = '/\[([^\]]+)\]\(([^)]+)\)/';
         return \preg_replace_callback(
