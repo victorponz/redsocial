@@ -22,21 +22,20 @@ class TweetRepository extends ServiceEntityRepository
     }
 
     /**
-    * @return Tweet[] Returns an array of Tweet objects
-    */
-   public function getAllByHashtag($hashtag): array
-   {
-    //https://stackoverflow.com/questions/6574760/regex-with-doctrine-2-query-builder
-       return $this->createQueryBuilder('t')->andWhere('REGEXP(t.content, :regexp) = true')
-        ->setParameter('regexp', "#hashtag[[:punct:][:space:]]|#$hashtag$")
-           ->orderBy('t.id', 'DESC')
-           ->setMaxResults(10)
-           ->getQuery()
-           ->getResult();
-    
-   }
+     * @return Tweet[] Returns an array of Tweet objects
+     */
+    public function getAllByHashtag($hashtag): array
+    {
+        //https://stackoverflow.com/questions/6574760/regex-with-doctrine-2-query-builder
+        return $this->createQueryBuilder('t')->andWhere('REGEXP(t.content, :regexp) = 1')
+            ->setParameter('regexp', "#$hashtag([[:cntrl:][:punct:][:space:]]|$)")
+            ->orderBy('t.id', 'DESC')
+            ->getQuery()
+            ->getResult();
 
-//    /**
+    }
+
+    //    /**
 //     * @return Tweet[] Returns an array of Tweet objects
 //     */
 //    public function findByExampleField($value): array
@@ -51,7 +50,7 @@ class TweetRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Tweet
+    //    public function findOneBySomeField($value): ?Tweet
 //    {
 //        return $this->createQueryBuilder('t')
 //            ->andWhere('t.exampleField = :val')
