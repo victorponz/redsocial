@@ -141,7 +141,7 @@ class TweetController extends AbstractController
                     $entityManager = $doctrine->getManager();
                     //Actualizar el contador de likes
                     $tweet->addLike();
-                    $entityManager->persist($tweet);
+                    $entityManager->persist($like);
                     $numLikes++;
                     $entityManager->flush();
                 }
@@ -160,6 +160,7 @@ class TweetController extends AbstractController
         $repo = $doctrine->getRepository(Tweet::class);
 
         $tweet = $repo->find($id);
+
         $numLikes = 0;
         $data = [];
         if ($tweet) {
