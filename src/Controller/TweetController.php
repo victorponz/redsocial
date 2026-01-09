@@ -63,7 +63,11 @@ class TweetController extends AbstractController
             }
 
             $repo = $doctrine->getRepository(User::class);
-            $userTweet = $repo->find($this->getUser()->getId());
+            /**
+             * @var User $user
+             */
+            $user = $this->getUser();
+            $userTweet = $repo->find($user->getId());
 
             $tweet->setUser($userTweet);
             $tweet->setLikes(0);
@@ -126,7 +130,12 @@ class TweetController extends AbstractController
              * @var UserRepository $repoUser
              */
             $repoUser = $doctrine->getRepository(User::class);
-            $userTMP = $repoUser->findOneByUsername($this->getUser()->getUsername());
+            /**
+             * @var User $user
+             */
+            $user = $this->getUser();
+            $userTMP = $repoUser->findOneByUsername($user->getUsername());
+
             //No seamos narcisistas!!
             if ($userTMP->getId() != $tweet->getUser()->getId()) {
                 //Comprobar que no haya dado ya like
@@ -181,14 +190,12 @@ class TweetController extends AbstractController
         $this->denyAccessUnlessGranted("ROLE_USER");
 
         $repo = $doctrine->getRepository(Tweet::class);
-        //No se por qué pero se hacen recursivos. Cada vez que refrescas la página se van concatenando
-        //Será porque está mal hecho el parsear los mensajes?
-        //$tweets = $this->getUser()->getTweets();
         /**
          * @var UserRepository $repoUser
          */
         $repoUser = $doctrine->getRepository(User::class);
-        $user = $repoUser->findOneByUsername($this->getUser()->getUsername());
+        $user = $repoUser->find($this->getUser()->getId());
+
         $tweets = $user->getTweets();
         return $this->render('tweet/user_tweets.html.twig', [
             'tweetUser' => $user,
