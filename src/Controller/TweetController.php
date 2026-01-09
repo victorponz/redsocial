@@ -122,14 +122,13 @@ class TweetController extends AbstractController
         $tweet = $repo->find($id);
         $numLikes = 0;
         if ($tweet) {
-            //No seamos narcisistas!!
-            $numLikes = $tweet->getLikes();
             /**
              * @var UserRepository $repoUser
              */
             $repoUser = $doctrine->getRepository(User::class);
             $userTMP = $repoUser->findOneByUsername($this->getUser()->getUsername());
-            if ($userTMP != $tweet->getUser()) {
+            //No seamos narcisistas!!
+            if ($userTMP->getId() != $tweet->getUser()->getId()) {
                 //Comprobar que no haya dado ya like
                 $repoLikes = $doctrine->getRepository(Like::class);
                 $tmpLike = $repoLikes->findOneBy(['user' => $this->getUser(), 'tweet' => $tweet]);
@@ -144,6 +143,7 @@ class TweetController extends AbstractController
                     $entityManager->persist($like);
                     $numLikes++;
                     $entityManager->flush();
+                    $numLikes = $tweet->getLikes();
                 }
             }
         }
