@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Entity\Tweet;
+use App\Repository\UserRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -28,6 +29,10 @@ class MainController extends AbstractController
     public function userProfile(ManagerRegistry $doctrine, string $username): Response
     {
         $this->denyAccessUnlessGranted("ROLE_USER");
+
+        /**
+         * @var UserRepository $repo
+         */
         $repo = $doctrine->getRepository(User::class);
         $user = $repo->findOneByUsername($username);
 
@@ -45,10 +50,17 @@ class MainController extends AbstractController
         $this->saveTargetPath($request->getSession(), $firewallName, $this->generateUrl("user_follow", ['username' => $username]));
         $this->denyAccessUnlessGranted("ROLE_USER");
 
+        /**
+         * @var UserRepository $repo
+         */
         $repo = $doctrine->getRepository(User::class);
 
         $userToFollow = $repo->findOneByUsername($username);
-        $userWhoFollows = $repo->findOneByUsername($this->getUser()->getUsername());
+        /**
+         * @var User $user
+         */
+        $user = $this->getUser();
+        $userWhoFollows = $repo->findOneByUsername($user->getUsername());
 
         if ($userToFollow != $userWhoFollows) {
             $entityManager = $doctrine->getManager();
@@ -66,7 +78,9 @@ class MainController extends AbstractController
     {
         $this->saveTargetPath($request->getSession(), $firewallName, $this->generateUrl("user_following", ['username' => $username]));
         $this->denyAccessUnlessGranted("ROLE_USER");
-
+        /**
+         * @var UserRepository $repo
+         */
         $repo = $doctrine->getRepository(User::class);
 
         $userToFollow = $repo->findOneByUsername($username);
@@ -88,7 +102,9 @@ class MainController extends AbstractController
     {
         $this->saveTargetPath($request->getSession(), $firewallName, $this->generateUrl("user_followers", ['username' => $username]));
         $this->denyAccessUnlessGranted("ROLE_USER");
-
+        /**
+         * @var UserRepository $repo
+         */
         $repo = $doctrine->getRepository(User::class);
 
         $userToFollow = $repo->findOneByUsername($username);
