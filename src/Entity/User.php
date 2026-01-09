@@ -39,17 +39,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $avatar = null;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Tweet::class, fetch:"EAGER")]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Tweet::class, fetch: "EAGER")]
     private Collection $tweets;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Like::class)]
     private Collection $likes;
 
     #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'users')]
-    private Collection $follows;
+    private Collection $following;
 
-    #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'follows')]
-    private Collection $usersWhoFollow;
+    #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'following')]
+    private Collection $followers;
 
     #[ORM\Column(length: 255)]
     private ?string $fullName = null;
@@ -58,8 +58,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->tweets = new ArrayCollection();
         $this->likes = new ArrayCollection();
-        $this->follows = new ArrayCollection();
-        $this->usersWhoFollow = new ArrayCollection();
+        $this->following = new ArrayCollection();
+        $this->followers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -167,8 +167,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function addTweet(Tweet $tweet): static
     {
         if (!$this->tweets->contains($tweet)) {
-            $this->tweets->add($tweet);
             $tweet->setUser($this);
+            $this->tweets->add($tweet);
         }
 
         return $this;
@@ -219,23 +219,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection<int, self>
      */
-    public function getFollows(): Collection
+    public function getFollowing(): Collection
     {
-        return $this->follows;
+        return $this->following;
     }
 
-    public function addFollow(self $follow): static
+    public function addFollow(self $userWhoFollows): static
     {
-        if (!$this->follows->contains($follow)) {
-            $this->follows->add($follow);
+        if (!$this->following->contains($userWhoFollows)) {
+            $this->following->add($userWhoFollows);
         }
 
         return $this;
     }
 
-    public function removeFollow(self $follow): static
+    public function removeFollowing(self $userWhoFollows): static
     {
-        $this->follows->removeElement($follow);
+        $this->following->removeElement($userWhoFollows);
 
         return $this;
     }
@@ -243,25 +243,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection<int, self>
      */
-    public function getUsersWhoFollow(): Collection
+    public function getFollowers(): Collection
     {
-        return $this->usersWhoFollow;
+        return $this->followers;
     }
 
-    public function addUserWhoFollows(self $user): static
+    public function addFollower(self $user): static
     {
-        if (!$this->usersWhoFollow->contains($user)) {
-            $this->usersWhoFollow->add($user);
+        if (!$this->followers->contains($user)) {
+            $this->followers->add($user);
             $user->addFollow($this);
         }
 
         return $this;
     }
 
-    public function removeUserWhoFollows(self $user): static
+    public function removeFollower(self $user): static
     {
-        if ($this->usersWhoFollow->removeElement($user)) {
-            $user->removeFollow($this);
+        if ($this->followers->removeElement($user)) {
+            $user->removeFollowing($this);
         }
 
         return $this;

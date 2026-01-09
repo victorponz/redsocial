@@ -31,7 +31,7 @@ class MainController extends AbstractController
         $repo = $doctrine->getRepository(User::class);
         $user = $repo->findOneByUsername($username);
 
-        if (!$user){
+        if (!$user) {
             throw $this->createNotFoundException("Usuario no encontrado");
         }
 
@@ -49,17 +49,17 @@ class MainController extends AbstractController
 
         $userToFollow = $repo->findOneByUsername($username);
         $userWhoFollows = $repo->findOneByUsername($this->getUser()->getUsername());
-       
-        if ($userToFollow != $userWhoFollows){
+
+        if ($userToFollow != $userWhoFollows) {
             $entityManager = $doctrine->getManager();
-            $userToFollow->addUserWhoFollows($userWhoFollows);
-            $entityManager->persist($userToFollow);            
-            $entityManager->flush();            
+            $userToFollow->addFollower($userWhoFollows);
+            $entityManager->persist($userToFollow);
+            $entityManager->flush();
         }
         //Devolvemos un array vacío tanto si ha ido correcto como si no
         $data = [];
         return new JsonResponse($data, Response::HTTP_OK);
-    }     
+    }
 
     #[Route('/user/@{username}/following', name: 'user_following')]
     public function followers(Request $request, ManagerRegistry $doctrine, string $username, string $firewallName = 'main'): JsonResponse
@@ -71,16 +71,16 @@ class MainController extends AbstractController
 
         $userToFollow = $repo->findOneByUsername($username);
         $data = [];
-        if ($userToFollow){            
-            foreach($userToFollow->getFollows()  as $following){
+        if ($userToFollow) {
+            foreach ($userToFollow->getFollows() as $following) {
                 $data[] = [
-                    "id"=> $following->getId(),
+                    "id" => $following->getId(),
                     "username" => ($following->getUserName()),
                 ];
             }
         }
         return new JsonResponse($data, Response::HTTP_OK);
-    }     
+    }
 
 
     #[Route('/user/@{username}/followers', name: 'user_followers')]
@@ -93,14 +93,14 @@ class MainController extends AbstractController
 
         $userToFollow = $repo->findOneByUsername($username);
         $data = [];
-        if ($userToFollow){            
-            foreach($userToFollow->getUsersWhoFollow()  as $follower){
+        if ($userToFollow) {
+            foreach ($userToFollow->getFollowers() as $follower) {
                 $data[] = [
-                    "id"=> $follower->getId(),
+                    "id" => $follower->getId(),
                     "username" => ($follower->getUserName()),
                 ];
             }
         }
         return new JsonResponse($data, Response::HTTP_OK);
-    }  
+    }
 }
