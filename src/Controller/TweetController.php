@@ -154,8 +154,9 @@ class TweetController extends AbstractController
     #[Route('/tweet/{id}/wholikes', name: 'tweet_wholikes', requirements: ['id' => '\d+'])]
     public function whoLikes(Request $request, ManagerRegistry $doctrine, int $id, string $firewallName = 'main'): JsonResponse
     {
-        // $this->saveTargetPath($request->getSession(), $firewallName, $this->generateUrl("tweet_like", ['id' => $id]));
-        // $this->denyAccessUnlessGranted("ROLE_USER");
+        // Redirigir a la página de inicio si no está autenticado y volver a este path cuando se loguee
+        $this->saveTargetPath($request->getSession(), $firewallName, $this->generateUrl("tweet_wholikes", ['id' => $id]));
+        $this->denyAccessUnlessGranted("ROLE_USER");
 
         $repo = $doctrine->getRepository(Tweet::class);
 
