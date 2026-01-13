@@ -6,9 +6,9 @@
 					<img class="tweet-avatar img-responsive" src="{{ asset('assets/images/' ~ tweet.image) }}" alt="{{tweet.user.username}}">
 				</a>
 			</li>
-			<li class='tweet-full-username'>
-				<a href="{{path('user_profile', {'username': tweet.user.username})}}">{{tweet.user.fullName}}</a>
-			</li>
+			{# <li class='tweet-full-username'>
+							<a href="{{path('user_profile', {'username': tweet.user.username})}}">{{tweet.user.fullName}}</a>
+						</li> #}
 			<li class='tweet-username'>
 				<a href="{{path('user_tweets', {'username': tweet.user.username})}}">@{{tweet.user.username}}</a>
 			</li>

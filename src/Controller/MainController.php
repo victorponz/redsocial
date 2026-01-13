@@ -83,10 +83,10 @@ class MainController extends AbstractController
          */
         $repo = $doctrine->getRepository(User::class);
 
-        $userToFollow = $repo->findOneByUsername($username);
+        $user = $repo->findOneByUsername($username);
         $data = [];
-        if ($userToFollow) {
-            foreach ($userToFollow->getFollows() as $following) {
+        if ($user) {
+            foreach ($user->getFollowing() as $following) {
                 $data[] = [
                     "id" => $following->getId(),
                     "username" => ($following->getUserName()),
@@ -107,10 +107,10 @@ class MainController extends AbstractController
          */
         $repo = $doctrine->getRepository(User::class);
 
-        $userToFollow = $repo->findOneByUsername($username);
+        $user = $repo->findOneByUsername($username);
         $data = [];
-        if ($userToFollow) {
-            foreach ($userToFollow->getFollowers() as $follower) {
+        if ($user) {
+            foreach ($user->getFollowers() as $follower) {
                 $data[] = [
                     "id" => $follower->getId(),
                     "username" => ($follower->getUserName()),
