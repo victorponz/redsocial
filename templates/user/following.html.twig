@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Following
+{% endblock %}
+
+{% block body %}
+	{% for userFollowing in usersFollowing %}
+		{{include('partials/_user.html.twig', {'user': userFollowing})}}
+	{% endfor %}
+{% endblock %}

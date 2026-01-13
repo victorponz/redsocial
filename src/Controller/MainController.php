@@ -73,8 +73,27 @@ class MainController extends AbstractController
         return new JsonResponse($data, Response::HTTP_OK);
     }
 
+
     #[Route('/user/@{username}/following', name: 'user_following')]
-    public function followers(Request $request, ManagerRegistry $doctrine, string $username, string $firewallName = 'main'): JsonResponse
+    public function followers(Request $request, ManagerRegistry $doctrine, string $username, string $firewallName = 'main'): Response
+    {
+        $this->saveTargetPath($request->getSession(), $firewallName, $this->generateUrl("user_following", ['username' => $username]));
+        $this->denyAccessUnlessGranted("ROLE_USER");
+        /**
+         * @var UserRepository $repo
+         */
+        $repo = $doctrine->getRepository(User::class);
+
+        $user = $repo->findOneByUsername($username);
+        return $this->render('user/following.html.twig', [
+            'usersFollowing' => $user->getFollowing()
+        ]);
+
+    }
+
+
+    #[Route('/user/@{username}/following/json', name: 'user_following_json')]
+    public function followersJson(Request $request, ManagerRegistry $doctrine, string $username, string $firewallName = 'main'): JsonResponse
     {
         $this->saveTargetPath($request->getSession(), $firewallName, $this->generateUrl("user_following", ['username' => $username]));
         $this->denyAccessUnlessGranted("ROLE_USER");
@@ -93,6 +112,7 @@ class MainController extends AbstractController
                 ];
             }
         }
+
         return new JsonResponse($data, Response::HTTP_OK);
     }
 
