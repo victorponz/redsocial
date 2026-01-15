@@ -45,10 +45,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Like::class)]
     private Collection $likes;
 
-    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'users')]
+    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'followers')]
     private Collection $following;
 
-    #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'following')]
+    #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'following', fetch: "EAGER")]
     private Collection $followers;
 
     #[ORM\Column(length: 255)]

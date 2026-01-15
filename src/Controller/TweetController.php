@@ -57,7 +57,7 @@ class TweetController extends AbstractController
                     new Response("Se ha producido un error al procesar la imagen" . $e->getMessage());
                 }
 
-                // updates the 'file$filename' property to store the PDF file name
+                // updates the 'file$filename' property to store the file name
                 // instead of its contents
                 $tweet->setImage($newFilename);
             }

@@ -7,12 +7,13 @@
 {% block body %}
 	{% if tweetUser %}
 		{{tweetUser.username}}
-		{% if app.user.id != tweetUser.id %}
-			seguir
+		{% if app.user and (app.user.id != tweetUser.id) %}
+			<a href="{{path('user_follow', {'username': tweetUser.username})}}">Seguir
+			{% endif %}
+			{% for tweet in tweets %}
+				{{include('partials/_tweet.html.twig', {'tweet': tweet})}}
+			{% endfor %}
+		{% else %}
+			Usuario no encontrado
 		{% endif %}
-		{% for tweet in tweets %}
-			{{include('partials/_tweet.html.twig', {'tweet': tweet})}}
-		{% endfor %}
-		{% else %}Usuario no encontrado
-	{% endif %}
-{% endblock %}
+	{% endblock %}

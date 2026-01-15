@@ -26,8 +26,10 @@ class MainController extends AbstractController
         ]);
     }
     #[Route('/user/@{username}', name: 'user_profile')]
-    public function userProfile(ManagerRegistry $doctrine, string $username): Response
+    public function userProfile(Request $request, ManagerRegistry $doctrine, string $username, string $firewallName = 'main'): Response
     {
+        $this->saveTargetPath($request->getSession(), $firewallName, $this->generateUrl("user_profile", ['username' => $username]));
+
         $this->denyAccessUnlessGranted("ROLE_USER");
 
         /**
@@ -44,27 +46,31 @@ class MainController extends AbstractController
             'user' => $user
         ]);
     }
+
     #[Route('/user/@{username}/follow', name: 'user_follow')]
     public function follow(Request $request, ManagerRegistry $doctrine, string $username, string $firewallName = 'main'): JsonResponse
     {
         $this->saveTargetPath($request->getSession(), $firewallName, $this->generateUrl("user_follow", ['username' => $username]));
         $this->denyAccessUnlessGranted("ROLE_USER");
 
-        /**
-         * @var UserRepository $repo
-         */
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+
+        /** @var UserRepository $repo */
         $repo = $doctrine->getRepository(User::class);
 
-        $userToFollow = $repo->findOneByUsername($username);
-        /**
-         * @var User $user
-         */
-        $user = $this->getUser();
-        $userWhoFollows = $repo->findOneByUsername($user->getUsername());
+        // Recargamos desde BD para asegurar que está "managed" y evitar errores de asociación en colecciones
+        $user = $repo->find($currentUser->getId());
 
-        if ($userToFollow != $userWhoFollows) {
+        $userToFollow = $repo->findOneBy(['username' => $username]);
+
+        if (!$userToFollow) {
+            throw $this->createNotFoundException("Usuario no encontrado");
+        }
+        // Si el usuario al que se quiere seguir no es el mismo que el logeado
+        if ($userToFollow->getId() != $user->getId()) {
             $entityManager = $doctrine->getManager();
-            $userToFollow->addFollower($userWhoFollows);
+            $userToFollow->addFollower($user);
             $entityManager->persist($userToFollow);
             $entityManager->flush();
         }
@@ -75,7 +81,7 @@ class MainController extends AbstractController
 
 
     #[Route('/user/@{username}/following', name: 'user_following')]
-    public function followers(Request $request, ManagerRegistry $doctrine, string $username, string $firewallName = 'main'): Response
+    public function following(Request $request, ManagerRegistry $doctrine, string $username, string $firewallName = 'main'): Response
     {
         $this->saveTargetPath($request->getSession(), $firewallName, $this->generateUrl("user_following", ['username' => $username]));
         $this->denyAccessUnlessGranted("ROLE_USER");
@@ -93,9 +99,8 @@ class MainController extends AbstractController
 
 
     #[Route('/user/@{username}/following/json', name: 'user_following_json')]
-    public function followersJson(Request $request, ManagerRegistry $doctrine, string $username, string $firewallName = 'main'): JsonResponse
+    public function followingJson(Request $request, ManagerRegistry $doctrine, string $username, string $firewallName = 'main'): JsonResponse
     {
-        $this->saveTargetPath($request->getSession(), $firewallName, $this->generateUrl("user_following", ['username' => $username]));
         $this->denyAccessUnlessGranted("ROLE_USER");
         /**
          * @var UserRepository $repo
@@ -118,9 +123,30 @@ class MainController extends AbstractController
 
 
     #[Route('/user/@{username}/followers', name: 'user_followers')]
-    public function following(Request $request, ManagerRegistry $doctrine, string $username, string $firewallName = 'main'): JsonResponse
+    public function followers(Request $request, ManagerRegistry $doctrine, string $username, string $firewallName = 'main'): JsonResponse
     {
         $this->saveTargetPath($request->getSession(), $firewallName, $this->generateUrl("user_followers", ['username' => $username]));
+        $this->denyAccessUnlessGranted("ROLE_USER");
+        /**
+         * @var UserRepository $repo
+         */
+        $repo = $doctrine->getRepository(User::class);
+
+        $user = $repo->findOneByUsername($username);
+        $data = [];
+        if ($user) {
+            foreach ($user->getFollowers() as $follower) {
+                $data[] = [
+                    "id" => $follower->getId(),
+                    "username" => ($follower->getUserName()),
+                ];
+            }
+        }
+        return new JsonResponse($data, Response::HTTP_OK);
+    }
+    #[Route('/user/@{username}/followers/json', name: 'user_followers_json')]
+    public function followersJson(Request $request, ManagerRegistry $doctrine, string $username, string $firewallName = 'main'): JsonResponse
+    {
         $this->denyAccessUnlessGranted("ROLE_USER");
         /**
          * @var UserRepository $repo
