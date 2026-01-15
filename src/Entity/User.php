@@ -224,18 +224,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->following;
     }
 
-    public function addFollow(self $userWhoFollows): static
+    public function addFollowing(self $userToFollow): static
     {
-        if (!$this->following->contains($userWhoFollows)) {
-            $this->following->add($userWhoFollows);
+        if (!$this->following->contains($userToFollow)) {
+            $this->following->add($userToFollow);
         }
 
         return $this;
     }
 
-    public function removeFollowing(self $userWhoFollows): static
+    public function removeFollowing(self $userToUnfollow): static
     {
-        $this->following->removeElement($userWhoFollows);
+        $this->following->removeElement($userToUnfollow);
 
         return $this;
     }
@@ -252,7 +252,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->followers->contains($user)) {
             $this->followers->add($user);
-            $user->addFollow($this);
         }
 
         return $this;
