@@ -74,9 +74,8 @@ class MainController extends AbstractController
             $entityManager->persist($userToFollow);
             $entityManager->flush();
         }
-        //Devolvemos un array vacío tanto si ha ido correcto como si no
-        $data = [];
-        return new JsonResponse($data, Response::HTTP_OK);
+
+        return new JsonResponse([], Response::HTTP_OK);
     }
 
 
