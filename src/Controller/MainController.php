@@ -109,12 +109,14 @@ class MainController extends AbstractController
         $user = $repo->findOneByUsername($username);
         $data = [];
         if ($user) {
-            foreach ($user->getFollowing() as $following) {
-                $data[] = [
+            $data = array_map(function ($following) {
+                return [
                     "id" => $following->getId(),
-                    "username" => ($following->getUserName()),
+                    "username" => $following->getUserName(),
                 ];
-            }
+            }, $user->getFollowing()->toArray());
+
+
         }
 
         return new JsonResponse($data, Response::HTTP_OK);
@@ -156,12 +158,12 @@ class MainController extends AbstractController
         $user = $repo->findOneByUsername($username);
         $data = [];
         if ($user) {
-            foreach ($user->getFollowers() as $follower) {
-                $data[] = [
+            $data = array_map(function ($follower) {
+                return [
                     "id" => $follower->getId(),
-                    "username" => ($follower->getUserName()),
+                    "username" => $follower->getUserName(),
                 ];
-            }
+            }, $user->getFollowers()->toArray());
         }
         return new JsonResponse($data, Response::HTTP_OK);
     }
