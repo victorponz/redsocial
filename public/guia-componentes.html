@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Guía de componentes — Cyber-Tribal</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect x=%226%22 y=%226%22 width=%2220%22 height=%2220%22 transform=%22rotate(45 16 16)%22 fill=%22%2307030F%22 stroke=%22%2300FFFF%22 stroke-width=%223%22/><circle cx=%2216%22 cy=%2216%22 r=%223%22 fill=%22%23FF00FF%22/></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Exo+2:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+    <link rel="stylesheet" href="assets/css/main.css">
+    <style>
+        /* Estilos propios de la guía (no forman parte del sistema) */
+        .guide-toc {
+            grid-column: 2;
+            grid-row: 1 / span 100;
+            position: sticky;
+            top: 96px;
+            align-self: start;
+        }
+        .guide-toc h4 {
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            color: var(--text-faint);
+            margin-bottom: var(--sp-3);
+        }
+        .guide-toc ol {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            counter-reset: toc;
+            border-left: 1px solid var(--border);
+        }
+        .guide-toc li { counter-increment: toc; }
+        .guide-toc a {
+            display: block;
+            padding: 4px var(--sp-3);
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .guide-toc a::before {
+            content: counter(toc, decimal-leading-zero) "  ";
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-faint);
+        }
+        .guide-toc a:hover { color: var(--cyan); }
+
+        .guide-intro { margin-bottom: var(--sp-6); }
+        .guide-intro p { color: var(--text-muted); font-size: 1.1rem; }
+
+        .guide-section {
+            margin-bottom: var(--sp-6);
+            scroll-margin-top: 96px;
+        }
+        .guide-section > h2 {
+            display: flex;
+            align-items: baseline;
+            gap: var(--sp-3);
+            padding-bottom: var(--sp-2);
+            border-bottom: 1px solid var(--border);
+        }
+        .guide-section > h2 span {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: var(--magenta);
+        }
+        .guide-section > h3 {
+            margin-top: var(--sp-5);
+            margin-bottom: var(--sp-3);
+            color: var(--text-muted);
+        }
+        .guide-section > p { color: var(--text-muted); }
+
+        .demo {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: var(--sp-3);
+            padding: var(--sp-4);
+            border: 1px solid var(--border);
+            border-bottom: 0;
+            border-radius: var(--radius) var(--radius) 0 0;
+            background: rgba(7, 3, 15, 0.55);
+        }
+        .demo.block { display: block; }
+        .demo .tweet { margin-left: 0 !important; margin-right: 0 !important; }
+        .demo .tweet:last-child { margin-bottom: 0; }
+
+        pre.code {
+            margin: 0 0 var(--sp-4);
+            padding: var(--sp-3) var(--sp-4);
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 0 0 var(--radius) var(--radius);
+            background: #05020B;
+            color: #CFC3EA;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            line-height: 1.6;
+            max-width: 100%;
+        }
+        pre.code.solo { border-radius: var(--radius); }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: var(--sp-4);
+            font-size: 0.92rem;
+        }
+        th, td {
+            text-align: left;
+            padding: var(--sp-2) var(--sp-3);
+            border-bottom: 1px solid rgba(191, 0, 255, 0.15);
+            vertical-align: top;
+        }
+        th {
+            font-weight: 500;
+            font-size: 0.8rem;
+            letter-spacing: 0.06em;
+            color: var(--text-faint);
+        }
+        td code, p code, li code {
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+            color: var(--cyan);
+            background: rgba(0, 255, 255, 0.07);
+            padding: 1px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+        .table-wrap { overflow-x: auto; }
+
+        .swatches {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-4);
+        }
+        .swatch {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: var(--surface);
+        }
+        .swatch i {
+            display: block;
+            height: 64px;
+        }
+        .swatch div {
+            padding: var(--sp-2) var(--sp-3);
+            font-size: 0.8rem;
+        }
+        .swatch b {
+            display: block;
+            font-family: var(--font-mono);
+            font-weight: 400;
+            color: var(--text);
+        }
+        .swatch span { color: var(--text-faint); font-family: var(--font-mono); }
+
+        .spacing-row {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: var(--sp-2);
+        }
+        .spacing-row i {
+            display: block;
+            height: 12px;
+            border-radius: 2px;
+            background: linear-gradient(90deg, var(--cyan), var(--magenta));
+        }
+        .spacing-row b { width: 64px; font-weight: 400; color: var(--text); }
+
+        .rules {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--sp-4);
+        }
+        .rules ul li {
+            padding: var(--sp-2) 0;
+            border-bottom: 1px solid rgba(191, 0, 255, 0.15);
+            font-size: 0.95rem;
+        }
+        .rules .do h4 { color: var(--jungle); }
+        .rules .dont h4 { color: var(--error); }
+
+        .note {
+            padding: var(--sp-3) var(--sp-4);
+            margin-bottom: var(--sp-4);
+            border-left: 3px solid var(--magenta);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            background: rgba(255, 0, 255, 0.06);
+            color: var(--text-muted);
+            font-size: 0.92rem;
+        }
+
+        @media (max-width: 767px) {
+            .guide-toc { display: none; }
+            .rules { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<header class="site-header">
+    <a class="site-brand" href="#top">Cyber-Tribal</a>
+    <nav class="site-nav">
+        <a href="#tokens">Tokens</a>
+        <a href="#botones">Botones</a>
+        <a href="#tweet">Tweet</a>
+        <a href="#reglas">Reglas</a>
+        <span class="site-nav-user">main.css</span>
+    </nav>
+</header>
+
+<main class="site-main" id="top">
+
+    <aside class="guide-toc">
+        <h4>Componentes</h4>
+        <ol>
+            <li><a href="#tokens">Tokens</a></li>
+            <li><a href="#tipografia">Tipografía</a></li>
+            <li><a href="#layout">Layout</a></li>
+            <li><a href="#botones">Botones</a></li>
+            <li><a href="#formularios">Formularios</a></li>
+            <li><a href="#cards">Cards</a></li>
+            <li><a href="#tweet">Tweet</a></li>
+            <li><a href="#listas">Listas</a></li>
+            <li><a href="#chips">Chips y estados</a></li>
+            <li><a href="#alertas">Alertas</a></li>
+            <li><a href="#tooltip">Tooltip</a></li>
+            <li><a href="#vacio">Estado vacío</a></li>
+            <li><a href="#skeleton">Skeleton</a></li>
+            <li><a href="#usuario">Cabecera de usuario</a></li>
+            <li><a href="#animaciones">Animaciones</a></li>
+            <li><a href="#reglas">Reglas</a></li>
+        </ol>
+    </aside>
+
+    <section class="guide-intro">
+        <h1 class="hero-title page-title">Guía de componentes</h1>
+        <p>Catálogo vivo de <code>public/assets/css/main.css</code>. Cada ejemplo usa la hoja de estilos real del proyecto: lo que ves aquí es exactamente lo que verás en las plantillas Twig. Todo funciona con HTML y clases CSS, sin JavaScript.</p>
+    </section>
+
+    <!-- ============ 01 TOKENS ============ -->
+    <section class="guide-section" id="tokens">
+        <h2><span>01</span>Tokens</h2>
+        <p>Definidos en <code>:root</code>. Úsalos siempre como <code>var(--token)</code>, nunca con valores sueltos. El sistema es <strong>solo oscuro</strong>: no hay fondos blancos.</p>
+
+        <h3>Paleta</h3>
+        <div class="swatches">
+            <div class="swatch"><i style="background:var(--cyan)"></i><div><b>--cyan</b><span>#00FFFF</span><br>Acento, enlaces, foco</div></div>
+            <div class="swatch"><i style="background:var(--magenta)"></i><div><b>--magenta</b><span>#FF00FF</span><br>Decoración, hashtags, likes</div></div>
+            <div class="swatch"><i style="background:var(--purple)"></i><div><b>--purple</b><span>#BF00FF</span><br>Bordes, halos</div></div>
+            <div class="swatch"><i style="background:var(--indigo)"></i><div><b>--indigo</b><span>#4B0082</span><br>Texto sobre cian</div></div>
+            <div class="swatch"><i style="background:var(--jungle)"></i><div><b>--jungle</b><span>#29AB87</span><br>Secundario, éxito</div></div>
+            <div class="swatch"><i style="background:var(--solar)"></i><div><b>--solar</b><span>#FF4500</span><br>CTA, aviso</div></div>
+            <div class="swatch"><i style="background:var(--error)"></i><div><b>--error</b><span>#FF3B6B</span><br>Errores</div></div>
+        </div>
+
+        <h3>Superficies y texto</h3>
+        <div class="swatches">
+            <div class="swatch"><i style="background:var(--bg)"></i><div><b>--bg</b><span>#07030F</span><br>Fondo de página</div></div>
+            <div class="swatch"><i style="background:var(--surface)"></i><div><b>--surface</b><span>#120A24</span><br>Superficie base</div></div>
+            <div class="swatch"><i style="background:var(--surface-2)"></i><div><b>--surface-2</b><span>#1B1033</span><br>Elevada</div></div>
+            <div class="swatch"><i style="background:var(--surface-3)"></i><div><b>--surface-3</b><span>#261646</span><br>Máxima elevación</div></div>
+            <div class="swatch"><i style="background:var(--text)"></i><div><b>--text</b><span>#EDE8F5</span><br>Texto principal</div></div>
+            <div class="swatch"><i style="background:var(--text-muted)"></i><div><b>--text-muted</b><span>#A99BC4</span><br>Secundario</div></div>
+            <div class="swatch"><i style="background:var(--text-faint)"></i><div><b>--text-faint</b><span>#6F6290</span><br>Metadatos</div></div>
+        </div>
+
+        <h3>Espaciado — base 8px</h3>
+        <div class="spacing-row"><b>--sp-1</b><i style="width:4px"></i>4px</div>
+        <div class="spacing-row"><b>--sp-2</b><i style="width:8px"></i>8px</div>
+        <div class="spacing-row"><b>--sp-3</b><i style="width:16px"></i>16px</div>
+        <div class="spacing-row"><b>--sp-4</b><i style="width:24px"></i>24px</div>
+        <div class="spacing-row"><b>--sp-5</b><i style="width:40px"></i>40px</div>
+        <div class="spacing-row"><b>--sp-6</b><i style="width:64px"></i>64px</div>
+
+        <h3>Forma, sombra, movimiento y capas</h3>
+        <div class="table-wrap">
+            <table>
+                <tr><th>Token</th><th>Valor</th><th>Uso</th></tr>
+                <tr><td><code>--radius</code></td><td>8px</td><td>Botones, inputs, cards</td></tr>
+                <tr><td><code>--radius-lg</code></td><td>16px</td><td>Tweets, estados vacíos</td></tr>
+                <tr><td><code>--shadow-card</code></td><td>sombra sutil</td><td>Reposo</td></tr>
+                <tr><td><code>--shadow-lift</code></td><td>sombra + halo púrpura</td><td>Hover / destacado</td></tr>
+                <tr><td><code>--glow-cyan</code></td><td>brillo cian</td><td>Foco, iconos</td></tr>
+                <tr><td><code>--dur-fast</code> / <code>--dur-entry</code></td><td>200ms / 540ms</td><td>Hover / entrada</td></tr>
+                <tr><td><code>--ease-out</code> / <code>--ease-spring</code></td><td>curvas</td><td>Salida / rebote</td></tr>
+                <tr><td><code>--z-nav</code> · <code>--z-overlay</code> · <code>--z-modal</code> · <code>--z-toast</code></td><td>100 · 200 · 300 · 500</td><td>Orden de capas</td></tr>
+            </table>
+        </div>
+    </section>
+
+    <!-- ============ 02 TIPOGRAFÍA ============ -->
+    <section class="guide-section" id="tipografia">
+        <h2><span>02</span>Tipografía</h2>
+        <div class="table-wrap">
+            <table>
+                <tr><th>Rol</th><th>Fuente</th><th>Tamaño</th></tr>
+                <tr><td>Títulos h1–h4</td><td>Azonix → Orbitron</td><td>2.25 / 1.5 / 1.25 / 1.05rem</td></tr>
+                <tr><td>Hero</td><td>Azonix → Orbitron</td><td><code>clamp(2.5rem, 5vw, 4rem)</code></td></tr>
+                <tr><td>Cuerpo</td><td>Exo 2</td><td>1rem / 1.6 · máx. 72ch</td></tr>
+                <tr><td>Labels</td><td>Exo 2</td><td>0.875rem · peso 500</td></tr>
+                <tr><td>Mono</td><td>JetBrains Mono</td><td>usuarios, fechas, contadores</td></tr>
+            </table>
+        </div>
+        <div class="demo block" data-code>
+            <h1 class="hero-title">Hero</h1>
+            <h1 class="page-title">Título de página</h1>
+            <h2>Encabezado h2</h2>
+            <h3>Encabezado h3</h3>
+            <p>Texto de cuerpo con un <a href="#tipografia">enlace en cian</a>.</p>
+            <small>Texto pequeño</small> · <span class="mono">2026-11-18 10:25</span>
+        </div>
+        <p><code>.page-title</code> pinta un degradado blanco → cian → magenta con una barra neón debajo. Úsalo una sola vez por página.</p>
+    </section>
+
+    <!-- ============ 03 LAYOUT ============ -->
+    <section class="guide-section" id="layout">
+        <h2><span>03</span>Layout</h2>
+        <p><code>base.html.twig</code> ya incluye esta estructura. La cabecera que ves arriba es el componente real.</p>
+        <pre class="code solo">&lt;header class="site-header"&gt;
+  &lt;a class="site-brand" href="/"&gt;Red_Social&lt;/a&gt;
+  &lt;nav class="site-nav"&gt;
+    &lt;a href="/tweets" aria-current="page"&gt;Timeline&lt;/a&gt;
+    &lt;a href="/tweet/add"&gt;Publicar&lt;/a&gt;
+    &lt;span class="site-nav-user"&gt;@ana&lt;/span&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;
+&lt;main class="site-main"&gt; … &lt;/main&gt;</pre>
+        <div class="table-wrap">
+            <table>
+                <tr><th>Clase</th><th>Comportamiento</th></tr>
+                <tr><td><code>.site-header</code></td><td>Fija arriba, translúcida y con una línea de neón animada debajo</td></tr>
+                <tr><td><code>.site-brand</code></td><td>Logotipo; el rombo gira en hover</td></tr>
+                <tr><td><code>.site-nav a</code></td><td>Indicador cian en hover. La página activa se marca con <code>aria-current="page"</code></td></tr>
+                <tr><td><code>.site-nav-user</code></td><td>Etiqueta mono en magenta para el usuario con sesión</td></tr>
+                <tr><td><code>.site-main</code></td><td>Máx. 1280px, rejilla asimétrica 7/3: el contenido va a la izquierda. Una sola columna por debajo de 768px</td></tr>
+            </table>
+        </div>
+        <p>Para ocupar la columna derecha (como el índice de esta página):</p>
+        <pre class="code solo">&lt;aside style="grid-column: 2; grid-row: 1 / span 100; position: sticky; top: 96px;"&gt;…&lt;/aside&gt;</pre>
+    </section>
+
+    <!-- ============ 04 BOTONES ============ -->
+    <section class="guide-section" id="botones">
+        <h2><span>04</span>Botones</h2>
+        <p><code>&lt;button&gt;</code> e <code>&lt;input type="submit"&gt;</code> reciben el estilo primario sin clase.</p>
+
+        <h3>Variantes</h3>
+        <div class="demo" data-code>
+            <button class="btn">Primario</button>
+            <a class="btn btn-secondary" href="#botones">Secundario</a>
+            <button class="btn btn-ghost">Ghost</button>
+            <button class="btn btn-cta">Llamada a la acción</button>
+            <button class="btn btn-destructive">Eliminar</button>
+            <button class="btn" disabled>Desactivado</button>
+        </div>
+
+        <h3>Tamaños</h3>
+        <div class="demo" data-code>
+            <button class="btn btn-sm">Pequeño</button>
+            <button class="btn">Mediano</button>
+            <button class="btn btn-lg">Grande</button>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <tr><th>Variante</th><th>Cuándo</th></tr>
+                <tr><td><code>.btn</code></td><td>Acción principal: una por vista</td></tr>
+                <tr><td><code>.btn-secondary</code></td><td>Acciones alternativas</td></tr>
+                <tr><td><code>.btn-ghost</code></td><td>Acciones terciarias</td></tr>
+                <tr><td><code>.btn-cta</code></td><td>Llamada secundaria destacada</td></tr>
+                <tr><td><code>.btn-destructive</code></td><td>Borrar, dejar de seguir</td></tr>
+            </table>
+        </div>
+        <p><strong>Estados:</strong> en hover se oscurece un 8 %, sube 2px y escala a 1.03; al pulsar baja 1px; el foco muestra un anillo cian de 2px.</p>
+    </section>
+
+    <!-- ============ 05 FORMULARIOS ============ -->
+    <section class="guide-section" id="formularios">
+        <h2><span>05</span>Formularios</h2>
+        <p>Los inputs, <code>textarea</code>, <code>select</code> y <code>label</code> no necesitan clases: los <code>form_row()</code> de Symfony salen estilados directamente.</p>
+        <div class="demo block" data-code>
+            <form onsubmit="return false">
+                <div>
+                    <label for="g-user">Usuario</label>
+                    <input id="g-user" type="text" placeholder="ana">
+                    <span class="help-text">Entre 3 y 20 caracteres</span>
+                </div>
+                <div>
+                    <label for="g-mail">Email</label>
+                    <input id="g-mail" type="email" value="correo-no-valido">
+                    <ul><li>Este email no es válido</li></ul>
+                </div>
+                <div>
+                    <label for="g-msg">Mensaje</label>
+                    <textarea id="g-msg" placeholder="¿Qué estás pensando?"></textarea>
+                </div>
+                <div>
+                    <label for="g-file">Imagen</label>
+                    <input id="g-file" type="file">
+                </div>
+                <div>
+                    <input id="g-terms" type="checkbox" checked>
+                    <label for="g-terms">Acepto las condiciones</label>
+                </div>
+                <div>
+                    <label for="g-off">Desactivado</label>
+                    <input id="g-off" type="text" value="No editable" disabled>
+                </div>
+                <button type="submit">Enviar</button>
+            </form>
+        </div>
+        <ul>
+            <li><strong>Error:</strong> un <code>&lt;ul&gt;&lt;li&gt;</code> dentro del <code>div</code> (es lo que genera Symfony) pone el campo con borde rojo y el mensaje debajo.</li>
+            <li><strong>Foco:</strong> anillo cian de 2px separado 2px del campo. No hay labels flotantes.</li>
+        </ul>
+    </section>
+
+    <!-- ============ 06 CARDS ============ -->
+    <section class="guide-section" id="cards">
+        <h2><span>06</span>Cards</h2>
+        <div class="demo block" data-code>
+            <div class="card">
+                <h4>Card</h4>
+                <p>Degradado de superficie, borde de 1px y sombra sutil.</p>
+            </div>
+            <br>
+            <div class="card card-elevated">
+                <h4>Card elevada</h4>
+                <p>Borde cian, halo y marcas tribales en las esquinas.</p>
+            </div>
+        </div>
+        <p>Son contenedores y no tienen animación de hover. Si una card debe ser interactiva, usa un enlace dentro de ella.</p>
+    </section>
+
+    <!-- ============ 07 TWEET ============ -->
+    <section class="guide-section" id="tweet">
+        <h2><span>07</span>Tweet</h2>
+        <p>Lo genera <code>templates/partials/_tweet.html.twig</code>.</p>
+        <div class="demo block" data-code>
+            <article class="tweet">
+                <div class="tweet_header">
+                    <ul>
+                        <li><a href="#tweet"><span class="tweet-avatar-placeholder">a</span></a></li>
+                        <li class="tweet-username"><a href="#tweet">@ana</a></li>
+                    </ul>
+                </div>
+                <div class="tweet-content"><a href="#tweet">@luis</a> Acabo de descubrir los fixtures <a href="/tweets/hashtag/symfony">#symfony</a> <a href="https://symfony.com">https://symfony.com</a></div>
+                <ul class="tweet-footer">
+                    <li class="tweet-date"><span class="timeago">hace 5 minutos</span></li>
+                    <li class="tweet-like"><a href="#tweet">Like <span class="tweet-like-count">3</span></a></li>
+                </ul>
+            </article>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <tr><th>Pieza</th><th>Detalle</th></tr>
+                <tr><td><code>.tweet</code></td><td>Radio de 16px y una línea de energía a la izquierda. En hover sube 3px y escala a 1.01</td></tr>
+                <tr><td><code>.tweet-avatar</code></td><td>Imagen de 44px con radio de 8px (para usuarios con avatar)</td></tr>
+                <tr><td><code>.tweet-avatar-placeholder</code></td><td>Hexágono con degradado y la inicial; gira 60° en hover</td></tr>
+                <tr><td><code>.tweet-content</code></td><td>Hashtags en magenta (se detectan por la URL <code>/tweets/hashtag/</code>); menciones y URLs en cian</td></tr>
+                <tr><td><code>.tweet-like</code></td><td>Píldora magenta con un rombo como icono</td></tr>
+            </table>
+        </div>
+        <p>En una lista, los tweets entran en cascada (120ms entre cada uno) y en escritorio se alternan en zig-zag.</p>
+    </section>
+
+    <!-- ============ 08 LISTAS ============ -->
+    <section class="guide-section" id="listas">
+        <h2><span>08</span>Listas</h2>
+        <div class="demo block" data-code>
+            <div class="list">
+                <a href="#listas">@ana</a>
+                <a href="#listas">@luis</a>
+                <a href="#listas">@marta</a>
+                <span>Elemento sin enlace</span>
+            </div>
+        </div>
+        <p>Cada elemento es una fila mono con borde. Los enlaces llevan un rombo cian delante y en hover se desplazan 4px. Pensada para seguidores, siguiendo y menús de perfil.</p>
+    </section>
+
+    <!-- ============ 09 CHIPS ============ -->
+    <section class="guide-section" id="chips">
+        <h2><span>09</span>Chips y estados</h2>
+        <h3>Chips</h3>
+        <div class="demo" data-code>
+            <a class="chip" href="#chips">#symfony</a>
+            <a class="chip" href="#chips">#doctrine</a>
+            <span class="chip active">#php</span>
+        </div>
+        <h3>Estados</h3>
+        <div class="demo" data-code>
+            <span class="status status-active">Activo</span>
+            <span class="status status-warning">Pendiente</span>
+            <span class="status status-error">Bloqueado</span>
+            <span class="status">Neutro</span>
+        </div>
+        <p>Ejemplo en Twig: nube de hashtags.</p>
+        <pre class="code solo">&lt;div style="display:flex; flex-wrap:wrap; gap:var(--sp-2)"&gt;
+  {% for tag in hashtags %}
+    &lt;a class="chip" href="{{ path('hashtag_tweets', {hashtag: tag}) }}"&gt;#{{ tag }}&lt;/a&gt;
+  {% endfor %}
+&lt;/div&gt;</pre>
+    </section>
+
+    <!-- ============ 10 ALERTAS ============ -->
+    <section class="guide-section" id="alertas">
+        <h2><span>10</span>Alertas</h2>
+        <div class="demo block" data-code>
+            <div class="alert alert-success">Tweet publicado.</div>
+            <div class="alert alert-danger">Credenciales incorrectas.</div>
+            <div class="alert alert-warning">Tu sesión caduca pronto.</div>
+            <div class="alert alert-info">Ahora sigues a @luis.</div>
+        </div>
+        <p>Con mensajes flash de Symfony (los tipos son <code>success</code>, <code>danger</code>, <code>warning</code> e <code>info</code>):</p>
+        <pre class="code solo">{% for type, messages in app.flashes %}
+  {% for message in messages %}
+    &lt;div class="alert alert-{{ type }}"&gt;{{ message }}&lt;/div&gt;
+  {% endfor %}
+{% endfor %}</pre>
+        <div class="note">Los controladores todavía no llaman a <code>addFlash()</code>, así que habría que añadirlo para usar este patrón.</div>
+    </section>
+
+    <!-- ============ 11 TOOLTIP ============ -->
+    <section class="guide-section" id="tooltip">
+        <h2><span>11</span>Tooltip</h2>
+        <div class="demo" data-code style="padding-top: var(--sp-6);">
+            <button class="btn btn-secondary" data-tooltip="Le gusta a 3 personas">Pasa el ratón</button>
+        </div>
+        <div class="note">Solo funciona con CSS, a través de <code>data-tooltip</code>, y ocupa el <code>::after</code> del elemento. En elementos que ya lo usan (por ejemplo, los enlaces de <code>.site-nav</code>), ponlo en un elemento que lo envuelva.</div>
+    </section>
+
+    <!-- ============ 12 VACÍO ============ -->
+    <section class="guide-section" id="vacio">
+        <h2><span>12</span>Estado vacío</h2>
+        <div class="demo block" data-code>
+            <div class="empty">
+                <p>Aún no sigues a nadie.</p>
+                <a class="btn btn-secondary" href="#vacio">Descubrir usuarios</a>
+            </div>
+        </div>
+        <p>Úsalo en la rama <code>{% else %}</code> de los <code>{% for %}</code>, siempre que una lista pueda quedar vacía.</p>
+    </section>
+
+    <!-- ============ 13 SKELETON ============ -->
+    <section class="guide-section" id="skeleton">
+        <h2><span>13</span>Skeleton</h2>
+        <div class="demo block" data-code>
+            <div style="display:flex; gap:16px; align-items:center;">
+                <div class="skeleton" style="width:44px; height:44px;"></div>
+                <div class="skeleton" style="width:120px; height:14px;"></div>
+            </div>
+            <div class="skeleton" style="width:85%; height:14px; margin-top:16px;"></div>
+            <div class="skeleton" style="width:60%; height:14px; margin-top:8px;"></div>
+        </div>
+        <p>Dale las mismas dimensiones que el componente que va a sustituir. No uses spinners circulares.</p>
+    </section>
+
+    <!-- ============ 14 USUARIO ============ -->
+    <section class="guide-section" id="usuario">
+        <h2><span>14</span>Cabecera de usuario</h2>
+        <div class="demo block" data-code>
+            <div class="user-header">
+                <h1>@ana</h1>
+                <a class="btn" href="#usuario">Seguir</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ 15 ANIMACIONES ============ -->
+    <section class="guide-section" id="animaciones">
+        <h2><span>15</span>Animaciones</h2>
+        <div class="table-wrap">
+            <table>
+                <tr><th>Keyframe</th><th>Efecto</th><th>Uso</th></tr>
+                <tr><td><code>rise-in</code></td><td>Aparece y sube 16px → 0</td><td>Entrada de elementos (540ms)</td></tr>
+                <tr><td><code>page-in</code></td><td>Aparece y se desliza desde la izquierda</td><td>Entrada de página (300ms)</td></tr>
+                <tr><td><code>neon-trail</code></td><td>Desplaza el fondo en horizontal</td><td>Líneas de neón</td></tr>
+                <tr><td><code>shimmer</code></td><td>Brillo que barre el elemento</td><td>Skeletons</td></tr>
+                <tr><td><code>tribal-spin</code></td><td>Rotación continua</td><td>Patrones de fondo</td></tr>
+            </table>
+        </div>
+        <pre class="code solo">.mi-elemento {
+  animation: rise-in var(--dur-entry) var(--ease-out) both;
+  animation-delay: 240ms; /* cascadas: múltiplos de 120ms */
+}</pre>
+        <p>Anima solo <code>transform</code> y <code>opacity</code>. Con <code>prefers-reduced-motion: reduce</code> todas las animaciones se desactivan automáticamente.</p>
+    </section>
+
+    <!-- ============ 16 REGLAS ============ -->
+    <section class="guide-section" id="reglas">
+        <h2><span>16</span>Reglas del sistema</h2>
+        <div class="rules">
+            <div class="card do">
+                <h4>Sí</h4>
+                <ul>
+                    <li>Patrones geométricos (rombos, hexágonos, rayos) con CSS o SVG inline</li>
+                    <li>Brillos de neón en hover y foco</li>
+                    <li>Composiciones asimétricas y zig-zag</li>
+                    <li>Entradas en cascada</li>
+                    <li>Cian solo para enlaces, foco y la acción principal</li>
+                </ul>
+            </div>
+            <div class="card dont">
+                <h4>No</h4>
+                <ul>
+                    <li>Emojis en la interfaz: usa iconos SVG (Lucide, Heroicons) o formas CSS</li>
+                    <li>Fondos blancos puros</li>
+                    <li>Rejillas de 3 columnas iguales</li>
+                    <li><code>100vh</code>: usa <code>min-height: 100dvh</code></li>
+                    <li>Spinners circulares ni labels flotantes</li>
+                    <li>Lorem ipsum, ni clichés como "Eleva" o "Sin fisuras"</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+    // Muestra debajo de cada ejemplo su propio HTML, para que el código nunca deje de coincidir.
+    document.querySelectorAll('.demo[data-code]').forEach(function (demo) {
+        var lines = demo.innerHTML.replace(/^\n+|\s+$/g, '').split('\n');
+        var indent = Math.min.apply(null, lines.filter(function (l) { return l.trim(); })
+            .map(function (l) { return l.match(/^\s*/)[0].length; }));
+        var pre = document.createElement('pre');
+        pre.className = 'code';
+        pre.textContent = lines.map(function (l) { return l.slice(indent); }).join('\n')
+            .replace(/ onsubmit="return false"/g, '');
+        demo.after(pre);
+    });
+</script>
+</body>
+</html>
