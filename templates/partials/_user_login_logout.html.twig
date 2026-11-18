@@ -1,7 +1,12 @@
-{%if app.user %}
-	<span>{{ app.user.username }}</span>
-	<a href="{{ path('app_logout') }}">Logout</a>
-	{%else%}
-	<a href="{{ path('app_login') }}">Login</a>
-	<a href="{{ path('app_register') }}">Register</a>
-	{%endif%}
+<nav class="site-nav">
+	{% if app.user %}
+		<a href="{{ path('user_tweets_timeline') }}">Timeline</a>
+		<a href="{{ path('tweet_add') }}">Publicar</a>
+		<a href="{{ path('user_following', {'username': app.user.username}) }}">Siguiendo</a>
+		<span class="site-nav-user">@{{ app.user.username }}</span>
+		<a href="{{ path('app_logout') }}">Logout</a>
+	{% else %}
+		<a href="{{ path('app_login') }}">Login</a>
+		<a href="{{ path('app_register') }}">Register</a>
+	{% endif %}
+</nav>

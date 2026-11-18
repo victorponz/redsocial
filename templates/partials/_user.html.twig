@@ -1,1 +1,1 @@
-<span>{{ user.username }}</span>
+<a href="{{ path('user_tweets', {'username': user.username}) }}">@{{ user.username }}</a>

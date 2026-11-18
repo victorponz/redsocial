@@ -3,11 +3,12 @@
    {{ hashtag }}
 {% endblock %}
 {% block body %}
-    {% if tweets %}   
-    {% for tweet in tweets %}
-        {{include('partials/_tweet.html.twig', {'tweet': tweet})}}
-    {% endfor %}
+    <h1 class="page-title">#{{ hashtag }}</h1>
+    {% if tweets %}
+        {% for tweet in tweets %}
+            {{include('partials/_tweet.html.twig', {'tweet': tweet})}}
+        {% endfor %}
     {% else %}
-    <p> Hashtag no encontrado</p>
-    {% endif %} 
+        <p class="empty">Hashtag no encontrado</p>
+    {% endif %}
 {% endblock %}

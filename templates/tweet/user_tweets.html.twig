@@ -6,14 +6,18 @@
 {% endblock %}
 {% block body %}
 	{% if tweetUser %}
-		{{tweetUser.username}}
-		{% if app.user and (app.user.id != tweetUser.id) %}
-			<a href="{{path('user_follow', {'username': tweetUser.username})}}">Seguir
+		<div class="user-header">
+			<h1>@{{tweetUser.username}}</h1>
+			{% if app.user and (app.user.id != tweetUser.id) %}
+				<a class="btn" href="{{path('user_follow', {'username': tweetUser.username})}}">Seguir</a>
 			{% endif %}
-			{% for tweet in tweets %}
-				{{include('partials/_tweet.html.twig', {'tweet': tweet})}}
-			{% endfor %}
+		</div>
+		{% for tweet in tweets %}
+			{{include('partials/_tweet.html.twig', {'tweet': tweet})}}
 		{% else %}
-			Usuario no encontrado
-		{% endif %}
-	{% endblock %}
+			<p class="empty">Este usuario aún no ha publicado nada</p>
+		{% endfor %}
+	{% else %}
+		<p class="empty">Usuario no encontrado</p>
+	{% endif %}
+{% endblock %}

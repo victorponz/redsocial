@@ -1,4 +1,14 @@
 {% extends "base.html.twig" %}
+{% block title %}{{ user.username }}{% endblock %}
 {% block body %}
-{{ user.username }} Profile
+<div class="user-header">
+    <h1>@{{ user.username }}</h1>
+    <a class="btn btn-secondary" href="{{ path('user_tweets', {'username': user.username}) }}">Ver tweets</a>
+</div>
+<div class="card card-elevated">
+    <h4>{{ user.fullName }}</h4>
+    <div class="list">
+        <a href="{{ path('user_following', {'username': user.username}) }}">Siguiendo</a>
+    </div>
+</div>
 {% endblock %}

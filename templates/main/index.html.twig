@@ -3,11 +3,12 @@
 {% block title %}Twiter{% endblock %}
 
 {% block body %}
- {% if tweets %}   
-    {% for tweet in tweets %}
-        {{include('partials/_tweet.html.twig', {'tweet': tweet})}}
-    {% endfor %}
+    <h1 class="page-title">Lo último</h1>
+    {% if tweets %}
+        {% for tweet in tweets %}
+            {{include('partials/_tweet.html.twig', {'tweet': tweet})}}
+        {% endfor %}
     {% else %}
-    <p> No se han encontrado Tweets</p>
-    {% endif %} 
+        <p class="empty">No se han encontrado Tweets</p>
+    {% endif %}
 {% endblock %}

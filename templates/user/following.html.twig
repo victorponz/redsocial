@@ -4,7 +4,12 @@
 {% endblock %}
 
 {% block body %}
-	{% for userFollowing in usersFollowing %}
-		{{include('partials/_user.html.twig', {'user': userFollowing})}}
-	{% endfor %}
+	<h1 class="page-title">Usuarios</h1>
+	<div class="list">
+		{% for userFollowing in usersFollowing %}
+			{{include('partials/_user.html.twig', {'user': userFollowing})}}
+		{% else %}
+			<p class="empty">No hay usuarios</p>
+		{% endfor %}
+	</div>
 {% endblock %}
