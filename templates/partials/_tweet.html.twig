@@ -25,7 +25,7 @@
 		</li>
 		{% if tweet.user.id != (app.user.id ?? -1)%}
 			<li class='tweet-like'>
-				<a href="{{path('tweet_like', {'id': tweet.id})}}" title='{{tweet.likes}}'>Like <span class="tweet-like-count">{{tweet.likes}}</span></a>
+				<a href="{{path('tweet_like', {'id': tweet.id})}}" title='{{tweet.likes}}' data-id="{{tweet.id}}">Like <span class="tweet-like-count">{{tweet.likes}}</span></a>
 			</li>
 		{% endif %}
 	</ul>
