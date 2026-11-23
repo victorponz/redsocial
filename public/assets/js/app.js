@@ -42,6 +42,11 @@ window.onload = function () {
                 if (tweetLikeCount) {
                     tweetLikeCount.textContent = data.numLikes;
                 }
+                // La lista de quién ha dado like ha cambiado: recargar el tooltip
+                delete enlace.dataset.loaded;
+                if (enlace.matches(':hover, :focus')) {
+                    mostrarTooltipLikes(enlace);
+                }
             })
             .catch(error => {
                 console.error('Error al hacer like:', error);
@@ -49,4 +54,77 @@ window.onload = function () {
     });
     ;
 });
+
+    // Tooltip con los avatares de quién ha dado like
+    document.querySelectorAll('.tweet-like a[data-wholikes]').forEach(enlace => {
+        const li = enlace.closest('.tweet-like');
+        let ocultarTimer;
+        const mostrar = () => { clearTimeout(ocultarTimer); mostrarTooltipLikes(enlace); };
+        const ocultar = () => {
+            ocultarTimer = setTimeout(() => { li.querySelector('.likes-tooltip').hidden = true; }, 150);
+        };
+        enlace.addEventListener('mouseenter', mostrar);
+        enlace.addEventListener('focus', mostrar);
+        li.addEventListener('mouseleave', ocultar);
+        enlace.addEventListener('blur', ocultar);
+        enlace.addEventListener('keydown', e => { if (e.key === 'Escape') li.querySelector('.likes-tooltip').hidden = true; });
+    });
+}
+
+function mostrarTooltipLikes(enlace) {
+    const tooltip = enlace.closest('.tweet-like').querySelector('.likes-tooltip');
+    tooltip.hidden = false;
+    if (enlace.dataset.loaded) return;
+    enlace.dataset.loaded = '1';
+    tooltip.innerHTML = '<span class="likes-tooltip-empty">Cargando…</span>';
+
+    fetch(enlace.dataset.wholikes, { headers: { 'Accept': 'application/json' } })
+        .then(response => {
+            const tipo = response.headers.get('Content-Type') || '';
+            if (!response.ok || !tipo.includes('application/json')) {
+                throw new Error(`Error HTTP: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(usuarios => pintarTooltipLikes(tooltip, usuarios))
+        .catch(() => {
+            delete enlace.dataset.loaded;
+            tooltip.innerHTML = '<span class="likes-tooltip-empty">Inicia sesión para ver los likes</span>';
+        });
+}
+
+function pintarTooltipLikes(tooltip, usuarios) {
+    tooltip.replaceChildren();
+    if (usuarios.length === 0) {
+        tooltip.innerHTML = '<span class="likes-tooltip-empty">Nadie ha dado like todavía</span>';
+        return;
+    }
+    const MAX = 8;
+    const lista = document.createElement('ul');
+    lista.className = 'likes-tooltip-list';
+    usuarios.slice(0, MAX).forEach(u => {
+        const item = document.createElement('li');
+        item.title = '@' + u.username;
+        let avatar;
+        if (u.avatar) {
+            avatar = document.createElement('img');
+            avatar.src = u.avatar;
+            avatar.alt = '@' + u.username;
+        } else {
+            avatar = document.createElement('span');
+            avatar.textContent = u.username.charAt(0);
+            avatar.setAttribute('aria-label', '@' + u.username);
+        }
+        avatar.className = 'likes-tooltip-avatar';
+        item.appendChild(avatar);
+        lista.appendChild(item);
+    });
+    tooltip.appendChild(lista);
+
+    const texto = document.createElement('p');
+    texto.className = 'likes-tooltip-text';
+    const nombres = usuarios.slice(0, 2).map(u => '@' + u.username).join(', ');
+    const resto = usuarios.length - 2;
+    texto.textContent = resto > 0 ? `${nombres} y ${resto} más` : nombres;
+    tooltip.appendChild(texto);
 }

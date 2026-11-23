@@ -11,6 +11,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
@@ -161,7 +162,7 @@ class TweetController extends AbstractController
     }
 
     #[Route('/tweet/{id}/wholikes', name: 'tweet_wholikes', requirements: ['id' => '\d+'])]
-    public function whoLikes(Request $request, ManagerRegistry $doctrine, int $id, string $firewallName = 'main'): JsonResponse
+    public function whoLikes(Request $request, ManagerRegistry $doctrine, Packages $packages, int $id, string $firewallName = 'main'): JsonResponse
     {
         // Redirigir a la página de inicio si no está autenticado y volver a este path cuando se loguee
         $this->saveTargetPath($request->getSession(), $firewallName, $this->generateUrl("tweet_wholikes", ['id' => $id]));
@@ -175,9 +176,13 @@ class TweetController extends AbstractController
         $data = [];
         if ($tweet) {
             foreach ($tweet->getLikesEntity() as $like) {
+                $likeUser = $like->getUser();
                 $data[] = [
                     "id" => $like->getId(),
-                    "username" => ($like->getUser()->getUserName()),
+                    "username" => $likeUser->getUserName(),
+                    "avatar" => $likeUser->getAvatar()
+                        ? $packages->getUrl('assets/images/' . $likeUser->getAvatar())
+                        : null,
                 ];
             }
         }

@@ -863,6 +863,85 @@ a.chip:hover {
     font-family: var(--font-mono);
 }
 
+/* Tooltip de likes: avatares circulares de quién ha dado like */
+.tweet-like {
+    position: relative;
+}
+.likes-tooltip {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    right: 0;
+    z-index: 20;
+    min-width: 160px;
+    max-width: 260px;
+    padding: var(--sp-2) var(--sp-3);
+    background: var(--surface-2);
+    border: 1px solid rgba(255, 0, 255, 0.45);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lift), 0 0 16px rgba(255, 0, 255, 0.25);
+    animation: likes-tooltip-in 180ms var(--ease-out);
+}
+.likes-tooltip[hidden] {
+    display: none;
+}
+.likes-tooltip::after {
+    /* flecha */
+    content: '';
+    position: absolute;
+    top: 100%;
+    right: 22px;
+    width: 10px;
+    height: 10px;
+    margin-top: -5px;
+    background: var(--surface-2);
+    border-right: 1px solid rgba(255, 0, 255, 0.45);
+    border-bottom: 1px solid rgba(255, 0, 255, 0.45);
+    transform: rotate(45deg);
+}
+.likes-tooltip-list {
+    display: flex;
+    flex-wrap: wrap;
+    padding-left: 8px;
+    margin: 0;
+    list-style: none;
+}
+.likes-tooltip-list li {
+    margin-left: -8px; /* avatares solapados */
+}
+.likes-tooltip-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--surface-2);
+    outline: 1px solid var(--magenta);
+    object-fit: cover;
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--text);
+    background: conic-gradient(from 45deg, var(--indigo), var(--purple), var(--magenta), var(--indigo));
+}
+.likes-tooltip-text,
+.likes-tooltip-empty {
+    display: block;
+    margin: var(--sp-1) 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: var(--text-muted);
+    overflow-wrap: anywhere;
+}
+.likes-tooltip-empty {
+    margin: 0;
+}
+@keyframes likes-tooltip-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
 /* ---------- Perfil / usuario ---------- */
 .user-header {
     display: flex;
