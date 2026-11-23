@@ -38,7 +38,6 @@ window.onload = function () {
             return response.json();
             })
             .then(data => {
-                console.log(data.numLikes);
                 let tweetLikeCount = enlace.querySelector('.tweet-like-count');
                 if (tweetLikeCount) {
                     tweetLikeCount.textContent = data.numLikes;
