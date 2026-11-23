@@ -208,4 +208,31 @@ class TweetController extends AbstractController
         ]);
     }
 
+    #[Route('/tweet/{id}/wholikesList', name: 'tweet_wholikes_list', requirements: ['id' => '\d+'])]
+    public function whoLikesList(Request $request, ManagerRegistry $doctrine, Packages $packages, int $id, string $firewallName = 'main'): Response
+    {
+        $repo = $doctrine->getRepository(Tweet::class);
+
+        $tweet = $repo->find($id);
+
+        $numLikes = 0;
+        $data = [];
+        if ($tweet) {
+            foreach ($tweet->getLikesEntity() as $like) {
+                $likeUser = $like->getUser();
+                $data[] = [
+                    "id" => $like->getId(),
+                    "username" => $likeUser->getUserName(),
+                    "avatar" => $likeUser->getAvatar()
+                        ? $packages->getUrl('assets/images/' . $likeUser->getAvatar())
+                        : null,
+                ];
+            }
+        }
+        return $this->render('tweet/tweet_wholikes_list.html.twig', [
+            'likes' => $data
+        ]);
+        
+    }
+
 }
