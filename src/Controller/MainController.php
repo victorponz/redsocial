@@ -70,8 +70,8 @@ class MainController extends AbstractController
         // Si el usuario al que se quiere seguir no es el mismo que el logeado
         if ($userToFollow->getId() != $user->getId()) {
             $entityManager = $doctrine->getManager();
-            $userToFollow->addFollowing($user);
-            $entityManager->persist($userToFollow);
+            $user->addFollowing($userToFollow);
+            $entityManager->persist($user);
             $entityManager->flush();
         }
 
