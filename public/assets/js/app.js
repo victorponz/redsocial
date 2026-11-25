@@ -47,7 +47,7 @@ window.onload = function () {
     });
 
     // Agregar evento de clic a los enlaces de "Like"
-    document.querySelectorAll('.tweet-like a').forEach(enlace => {
+    document.querySelectorAll('.tweet-like > a').forEach(enlace => {
     enlace.addEventListener('click', event => {
         // Evitamos que el enlace recargue la página
         event.preventDefault();
@@ -78,7 +78,7 @@ window.onload = function () {
 });
 
     // Tooltip con los avatares de quién ha dado like
-    document.querySelectorAll('.tweet-like a[data-wholikes]').forEach(enlace => {
+    document.querySelectorAll('.tweet-like > a[data-wholikes]').forEach(enlace => {
         const li = enlace.closest('.tweet-like');
         let ocultarTimer;
         const mostrar = () => { clearTimeout(ocultarTimer); mostrarTooltipLikes(enlace); };
@@ -87,6 +87,11 @@ window.onload = function () {
         };
         enlace.addEventListener('mouseenter', mostrar);
         enlace.addEventListener('focus', mostrar);
+        const tooltip = li.querySelector('.likes-tooltip');
+        // Mantener abierto el tooltip mientras el ratón o el foco estén sobre él (para poder hacer clic)
+        tooltip.addEventListener('mouseenter', () => clearTimeout(ocultarTimer));
+        tooltip.addEventListener('focusin', () => clearTimeout(ocultarTimer));
+        tooltip.addEventListener('focusout', ocultar);
         li.addEventListener('mouseleave', ocultar);
         enlace.addEventListener('blur', ocultar);
         enlace.addEventListener('keydown', e => { if (e.key === 'Escape') li.querySelector('.likes-tooltip').hidden = true; });
@@ -112,7 +117,7 @@ function mostrarTooltipLikes(enlace) {
             }
             return response.json();
         })
-        .then(usuarios => pintarTooltipLikes(tooltip, usuarios))
+        .then(usuarios => pintarTooltipLikes(tooltip, usuarios, enlace.dataset.wholikesList))
         .catch(error => {
             delete enlace.dataset.loaded;
             const mensaje = error.message === 'login'
@@ -123,7 +128,7 @@ function mostrarTooltipLikes(enlace) {
         });
 }
 
-function pintarTooltipLikes(tooltip, usuarios) {
+function pintarTooltipLikes(tooltip, usuarios, urlLista) {
     tooltip.replaceChildren();
     if (usuarios.length === 0) {
         tooltip.innerHTML = '<span class="likes-tooltip-empty">Nadie ha dado like todavía</span>';
@@ -149,12 +154,18 @@ function pintarTooltipLikes(tooltip, usuarios) {
         item.appendChild(avatar);
         lista.appendChild(item);
     });
-    tooltip.appendChild(lista);
 
     const texto = document.createElement('p');
     texto.className = 'likes-tooltip-text';
     const nombres = usuarios.slice(0, 2).map(u => '@' + u.username).join(', ');
     const resto = usuarios.length - 2;
     texto.textContent = resto > 0 ? `${nombres} y ${resto} más` : nombres;
-    tooltip.appendChild(texto);
+
+    // Todo el tooltip es un enlace a la página con la lista completa
+    const enlaceLista = document.createElement('a');
+    enlaceLista.className = 'likes-tooltip-link';
+    enlaceLista.href = urlLista;
+    enlaceLista.setAttribute('aria-label', `Ver los ${usuarios.length} usuarios a los que les gusta`);
+    enlaceLista.append(lista, texto);
+    tooltip.appendChild(enlaceLista);
 }
