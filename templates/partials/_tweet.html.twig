@@ -21,7 +21,7 @@
 	<div class='tweet-content'>{{tweet.content | striptags | escape | formatMention | formatHashtag | formatURL| raw}}</div>
 	<ul class='tweet-footer'>
 		<li class='tweet-date'>
-			<span class='timeago'>{{tweet.date | date('m/d/Y H:i:s')}}</span>
+			<span class='timeago'>{{tweet.date | date('c')}}</span>
 		</li>
 		{% if tweet.user.id != (app.user.id ?? -1)%}
 			<li class='tweet-like'>

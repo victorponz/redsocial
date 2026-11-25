@@ -8,12 +8,34 @@ TimeAgo.addDefaultLocale({
         }
     },
     long: {
-        year: {
-            past: {
-                one: "hace {0} año",
-                other: "hace {0} años"
-            }
+        second: {
+            past: { one: "hace {0} segundo", other: "hace {0} segundos" },
+            future: { one: "dentro de {0} segundo", other: "dentro de {0} segundos" }
         },
+        minute: {
+            past: { one: "hace {0} minuto", other: "hace {0} minutos" },
+            future: { one: "dentro de {0} minuto", other: "dentro de {0} minutos" }
+        },
+        hour: {
+            past: { one: "hace {0} hora", other: "hace {0} horas" },
+            future: { one: "dentro de {0} hora", other: "dentro de {0} horas" }
+        },
+        day: {
+            past: { one: "hace {0} día", other: "hace {0} días" },
+            future: { one: "dentro de {0} día", other: "dentro de {0} días" }
+        },
+        week: {
+            past: { one: "hace {0} semana", other: "hace {0} semanas" },
+            future: { one: "dentro de {0} semana", other: "dentro de {0} semanas" }
+        },
+        month: {
+            past: { one: "hace {0} mes", other: "hace {0} meses" },
+            future: { one: "dentro de {0} mes", other: "dentro de {0} meses" }
+        },
+        year: {
+            past: { one: "hace {0} año", other: "hace {0} años" },
+            future: { one: "dentro de {0} año", other: "dentro de {0} años" }
+        }
     }
 })
 
@@ -21,7 +43,7 @@ window.onload = function () {
     const timeAgo = new TimeAgo('es');
     const nodes = document.querySelectorAll('span.timeago');
     nodes.forEach(node => {
-        node.textContent = timeAgo.format(new Date(node.textContent));
+        node.textContent = timeAgo.format(new Date(node.textContent.trim()));
     });
 
     // Agregar evento de clic a los enlaces de "Like"
