@@ -721,7 +721,8 @@ a.chip:hover {
         transform var(--dur-fast) var(--ease-out),
         box-shadow var(--dur-fast) ease,
         border-color var(--dur-fast) ease;
-    animation: rise-in var(--dur-entry) var(--ease-out) both;
+    /* backwards (no both): al terminar se suelta la animación y el texto no se queda en una capa compuesta (se veía gris) */
+    animation: rise-in var(--dur-entry) var(--ease-out) backwards;
 }
 /* Línea de energía lateral */
 .tweet::before {
