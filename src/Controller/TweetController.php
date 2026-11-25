@@ -161,11 +161,11 @@ class TweetController extends AbstractController
         return new JsonResponse($data, Response::HTTP_OK);
     }
 
-    #[Route('/tweet/{id}/wholikes', name: 'tweet_wholikes', requirements: ['id' => '\d+'])]
-    public function whoLikes(Request $request, ManagerRegistry $doctrine, Packages $packages, int $id, string $firewallName = 'main'): JsonResponse
+    #[Route('/tweet/{id}/wholikes', name: 'tweet_wholikes-json', requirements: ['id' => '\d+'],
+            condition: "request.getPreferredFormat() === 'json'")]
+    public function whoLikesJson(Request $request, ManagerRegistry $doctrine, Packages $packages, int $id, string $firewallName = 'main'): JsonResponse
     {
         // Redirigir a la página de inicio si no está autenticado y volver a este path cuando se loguee
-        $this->saveTargetPath($request->getSession(), $firewallName, $this->generateUrl("tweet_wholikes", ['id' => $id]));
         $this->denyAccessUnlessGranted("ROLE_USER");
 
         $repo = $doctrine->getRepository(Tweet::class);
@@ -188,6 +188,8 @@ class TweetController extends AbstractController
         }
         return new JsonResponse($data, Response::HTTP_OK);
     }
+    
+    
     #[Route('/tweets', name: 'user_tweets_timeline')]
     public function userTweetsTimeLine(Request $request, ManagerRegistry $doctrine, string $firewallName = 'main'): Response
     {
@@ -208,7 +210,7 @@ class TweetController extends AbstractController
         ]);
     }
 
-    #[Route('/tweet/{id}/wholikesList', name: 'tweet_wholikes_list', requirements: ['id' => '\d+'])]
+    #[Route('/tweet/{id}/wholikes', name: 'tweet_wholikes_list', requirements: ['id' => '\d+'])]
     public function whoLikesList(Request $request, ManagerRegistry $doctrine, Packages $packages, int $id, string $firewallName = 'main'): Response
     {
         $repo = $doctrine->getRepository(Tweet::class);
@@ -230,6 +232,7 @@ class TweetController extends AbstractController
             }
         }
         return $this->render('tweet/tweet_wholikes_list.html.twig', [
+            'tweet' => $tweet,
             'likes' => $data
         ]);
         

@@ -25,7 +25,7 @@
 		</li>
 		{% if tweet.user.id != (app.user.id ?? -1)%}
 			<li class='tweet-like'>
-				<a href="{{path('tweet_like', {'id': tweet.id})}}" data-id="{{tweet.id}}" data-wholikes="{{path('tweet_wholikes', {'id': tweet.id})}}" aria-describedby="likes-tooltip-{{tweet.id}}">Like <span class="tweet-like-count">{{tweet.likes}}</span></a>
+				<a href="{{path('tweet_like', {'id': tweet.id})}}" data-id="{{tweet.id}}" data-wholikes="{{path('tweet_wholikes-json', {'id': tweet.id})}}" aria-describedby="likes-tooltip-{{tweet.id}}">Like <span class="tweet-like-count">{{tweet.likes}}</span></a>
 				<div class="likes-tooltip" id="likes-tooltip-{{tweet.id}}" role="tooltip" hidden></div>
 			</li>
 		{% endif %}

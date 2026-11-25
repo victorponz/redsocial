@@ -103,15 +103,23 @@ function mostrarTooltipLikes(enlace) {
     fetch(enlace.dataset.wholikes, { headers: { 'Accept': 'application/json' } })
         .then(response => {
             const tipo = response.headers.get('Content-Type') || '';
+            // Si no hay sesión, Symfony redirige al login (HTML en vez de JSON)
+            if (response.redirected || response.status === 401 || response.status === 403) {
+                throw new Error('login');
+            }
             if (!response.ok || !tipo.includes('application/json')) {
                 throw new Error(`Error HTTP: ${response.status}`);
             }
             return response.json();
         })
         .then(usuarios => pintarTooltipLikes(tooltip, usuarios))
-        .catch(() => {
+        .catch(error => {
             delete enlace.dataset.loaded;
-            tooltip.innerHTML = '<span class="likes-tooltip-empty">Inicia sesión para ver los likes</span>';
+            const mensaje = error.message === 'login'
+                ? 'Inicia sesión para ver los likes'
+                : 'No se han podido cargar los likes';
+            if (error.message !== 'login') console.error('Error al cargar los likes:', error);
+            tooltip.innerHTML = `<span class="likes-tooltip-empty">${mensaje}</span>`;
         });
 }
 

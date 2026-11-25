@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Likes del tweet
+{% endblock %}
+
+{% block body %}
+	{% if tweet %}
+		<div class="user-header">
+			<h1>Likes</h1>
+			<span class="chip">{{ likes|length }} {{ likes|length == 1 ? 'usuario' : 'usuarios' }}</span>
+		</div>
+		<p class="small">
+			Tweet de
+			<a href="{{ path('user_tweets', {'username': tweet.user.username}) }}">@{{ tweet.user.username }}</a>
+		</p>
+
+		<div class="list list-users">
+			{% for like in likes %}
+				<a href="{{ path('user_tweets', {'username': like.username}) }}">
+					{% if like.avatar %}
+						<img class="list-avatar" src="{{ like.avatar }}" alt="">
+					{% else %}
+						<span class="list-avatar tweet-avatar-placeholder" aria-hidden="true">{{ like.username|first }}</span>
+					{% endif %}
+					@{{ like.username }}
+				</a>
+			{% else %}
+				<p class="empty">Nadie ha dado like a este tweet todavía</p>
+			{% endfor %}
+		</div>
+	{% else %}
+		<p class="empty">Tweet no encontrado</p>
+	{% endif %}
+{% endblock %}
