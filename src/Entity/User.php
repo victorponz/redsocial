@@ -40,6 +40,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $avatar = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Tweet::class, fetch: "EAGER")]
+    #[ORM\OrderBy(['date' => 'DESC', 'id' => 'DESC'])] // más recientes primero
     private Collection $tweets;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Like::class)]

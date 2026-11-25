@@ -49,7 +49,8 @@ class TweetRepository extends ServiceEntityRepository
         //https://stackoverflow.com/questions/6574760/regex-with-doctrine-2-query-builder
         return $this->createQueryBuilder('t')->andWhere('REGEXP(t.content, :regexp) = 1')
             ->setParameter('regexp', "#$hashtag([[:cntrl:][:punct:][:space:]]|$)")
-            ->orderBy('t.id', 'DESC')
+            ->orderBy('t.date', 'DESC')
+            ->addOrderBy('t.id', 'DESC')
             ->getQuery()
             ->getResult();
 
