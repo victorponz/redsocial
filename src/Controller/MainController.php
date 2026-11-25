@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Entity\Tweet;
+use App\Repository\TweetRepository;
 use App\Repository\UserRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,14 +17,29 @@ use Symfony\Component\Security\Http\Util\TargetPathTrait;
 class MainController extends AbstractController
 {
     use TargetPathTrait;
+    private const TWEETS_PER_PAGE = 10;
+
     #[Route('/', name: 'index')]
-    public function index(ManagerRegistry $doctrine): Response
+    public function index(Request $request, ManagerRegistry $doctrine): Response
     {
+        $page = max(1, $request->query->getInt('page', 1));
+
+        /** @var TweetRepository $repo */
         $repo = $doctrine->getRepository(Tweet::class);
-        $tweets = $repo->findAll();
-        return $this->render('main/index.html.twig', [
+        $tweets = $repo->getPaginated($page, self::TWEETS_PER_PAGE);
+
+        $totalPages = (int) ceil(count($tweets) / self::TWEETS_PER_PAGE);
+        $params = [
             'tweets' => $tweets,
-        ]);
+            'nextPage' => $page < $totalPages ? $page + 1 : null,
+        ];
+
+        // El scroll infinito pide solo el siguiente bloque de tweets (sin layout)
+        if ($request->isXmlHttpRequest()) {
+            return $this->render('main/_tweets_page.html.twig', $params);
+        }
+
+        return $this->render('main/index.html.twig', $params);
     }
     #[Route('/user/@{username}', name: 'user_profile')]
     public function userProfile(Request $request, ManagerRegistry $doctrine, string $username, string $firewallName = 'main'): Response

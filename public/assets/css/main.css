@@ -736,7 +736,8 @@ a.chip:hover {
     transition: opacity var(--dur-fast) ease;
 }
 .tweet:hover {
-    transform: translateY(-3px) scale(1.01);
+    /* sin scale(): escalar re-rasteriza el texto y cambia su tono al pasar el ratón o hacer scroll */
+    transform: translateY(-3px);
     border-color: var(--border-strong);
     box-shadow: var(--shadow-lift);
 }
@@ -1099,4 +1100,20 @@ a.chip:hover {
     .tweet:hover {
         transform: none;
     }
+}
+
+/* ---------- Scroll infinito ---------- */
+.feed-sentinel {
+    display: flex;
+    justify-content: center;
+    padding: var(--sp-4) 0;
+}
+.feed-sentinel.is-loading .btn {
+    /* mientras carga, el botón se convierte en un skeleton */
+    pointer-events: none;
+    color: transparent;
+    border-color: transparent;
+    background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s linear infinite;
 }

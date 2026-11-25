@@ -1,0 +1,9 @@
+{# Un bloque de tweets del scroll infinito. Termina con el centinela que apunta a la página siguiente. #}
+{% for tweet in tweets %}
+	{{ include('partials/_tweet.html.twig', {'tweet': tweet}) }}
+{% endfor %}
+{% if nextPage %}
+	<div class="feed-sentinel" data-next="{{ path('index', {'page': nextPage}) }}">
+		<a class="btn btn-ghost" href="{{ path('index', {'page': nextPage}) }}">Cargar más</a>
+	</div>
+{% endif %}

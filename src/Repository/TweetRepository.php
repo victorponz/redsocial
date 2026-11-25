@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Tweet;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -19,6 +20,25 @@ class TweetRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Tweet::class);
+    }
+
+    /**
+     * Tweets más recientes primero, paginados con el Paginator de Doctrine.
+     *
+     * @return Paginator<Tweet>
+     */
+    public function getPaginated(int $page, int $limit): Paginator
+    {
+        $query = $this->createQueryBuilder('t')
+            ->addSelect('u')
+            ->join('t.user', 'u')
+            ->orderBy('t.date', 'DESC')
+            ->addOrderBy('t.id', 'DESC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->getQuery();
+
+        return new Paginator($query, fetchJoinCollection: false);
     }
 
     /**

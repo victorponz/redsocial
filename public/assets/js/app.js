@@ -39,15 +39,23 @@ TimeAgo.addDefaultLocale({
     }
 })
 
+const timeAgo = new TimeAgo('es');
+
 window.onload = function () {
-    const timeAgo = new TimeAgo('es');
-    const nodes = document.querySelectorAll('span.timeago');
+    inicializarTweets(document);
+    inicializarScrollInfinito();
+}
+
+// Prepara los tweets que haya dentro de root: fechas relativas, like y tooltip.
+// Se llama al cargar la página y con cada bloque nuevo del scroll infinito.
+function inicializarTweets(root) {
+    const nodes = root.querySelectorAll('span.timeago');
     nodes.forEach(node => {
         node.textContent = timeAgo.format(new Date(node.textContent.trim()));
     });
 
     // Agregar evento de clic a los enlaces de "Like"
-    document.querySelectorAll('.tweet-like > a').forEach(enlace => {
+    root.querySelectorAll('.tweet-like > a').forEach(enlace => {
     enlace.addEventListener('click', event => {
         // Evitamos que el enlace recargue la página
         event.preventDefault();
@@ -78,7 +86,7 @@ window.onload = function () {
 });
 
     // Tooltip con los avatares de quién ha dado like
-    document.querySelectorAll('.tweet-like > a[data-wholikes]').forEach(enlace => {
+    root.querySelectorAll('.tweet-like > a[data-wholikes]').forEach(enlace => {
         const li = enlace.closest('.tweet-like');
         let ocultarTimer;
         const mostrar = () => { clearTimeout(ocultarTimer); mostrarTooltipLikes(enlace); };
@@ -96,6 +104,58 @@ window.onload = function () {
         enlace.addEventListener('blur', ocultar);
         enlace.addEventListener('keydown', e => { if (e.key === 'Escape') li.querySelector('.likes-tooltip').hidden = true; });
     });
+}
+
+// Scroll infinito: cuando el centinela del final entra en pantalla se pide la página siguiente
+function inicializarScrollInfinito() {
+    const feed = document.querySelector('.feed');
+    if (!feed || !('IntersectionObserver' in window)) return; // sin soporte queda el enlace "Cargar más"
+
+    let cargando = false;
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) cargarSiguientePagina(entry.target);
+        });
+    }, { rootMargin: '400px 0px' }); // empezar a cargar un poco antes de llegar al final
+
+    function observarCentinela() {
+        const centinela = feed.querySelector('.feed-sentinel');
+        if (centinela) observer.observe(centinela);
+    }
+
+    function cargarSiguientePagina(centinela) {
+        if (cargando) return;
+        cargando = true;
+        observer.unobserve(centinela);
+        centinela.classList.add('is-loading');
+
+        fetch(centinela.dataset.next, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(response => {
+                if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+                return response.text();
+            })
+            .then(html => {
+                const plantilla = document.createElement('template');
+                plantilla.innerHTML = html;
+                const nuevos = plantilla.content;
+                // Escalonar la animación de entrada solo entre los tweets nuevos
+                nuevos.querySelectorAll('.tweet').forEach((tweet, i) => {
+                    tweet.style.animationDelay = `${Math.min(i, 5) * 80}ms`;
+                });
+                inicializarTweets(nuevos);
+                centinela.replaceWith(nuevos);
+                observarCentinela();
+            })
+            .catch(error => {
+                console.error('Error al cargar más tweets:', error);
+                centinela.classList.remove('is-loading');
+                // Si falla, el enlace "Cargar más" sigue ahí para reintentar a mano
+                setTimeout(() => observer.observe(centinela), 3000);
+            })
+            .finally(() => { cargando = false; });
+    }
+
+    observarCentinela();
 }
 
 function mostrarTooltipLikes(enlace) {
